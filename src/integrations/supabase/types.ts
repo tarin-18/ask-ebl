@@ -9,7 +9,135 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      faqs: {
+        Row: {
+          answer: string
+          category: string | null
+          created_at: string
+          id: string
+          keywords: string[] | null
+          question: string
+        }
+        Insert: {
+          answer: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string[] | null
+          question: string
+        }
+        Update: {
+          answer?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string[] | null
+          question?: string
+        }
+        Relationships: []
+      }
+      loans: {
+        Row: {
+          created_at: string
+          id: string
+          interest_rate: number
+          loan_type: string
+          monthly_payment: number
+          next_payment_date: string | null
+          paid_amount: number | null
+          remaining_amount: number
+          total_amount: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interest_rate: number
+          loan_type: string
+          monthly_payment: number
+          next_payment_date?: string | null
+          paid_amount?: number | null
+          remaining_amount: number
+          total_amount: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interest_rate?: number
+          loan_type?: string
+          monthly_payment?: number
+          next_payment_date?: string | null
+          paid_amount?: number | null
+          remaining_amount?: number
+          total_amount?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          account_number: string | null
+          balance: number | null
+          created_at: string
+          full_name: string | null
+          id: string
+          savings_balance: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_number?: string | null
+          balance?: number | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          savings_balance?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_number?: string | null
+          balance?: number | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          savings_balance?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          balance_after: number | null
+          description: string | null
+          id: string
+          transaction_date: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after?: number | null
+          description?: string | null
+          id?: string
+          transaction_date?: string
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number | null
+          description?: string | null
+          id?: string
+          transaction_date?: string
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
