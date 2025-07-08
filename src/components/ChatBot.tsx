@@ -159,13 +159,18 @@ Please try asking about any of these topics, or contact our customer service at 
   return (
     <div className="flex-1 flex flex-col h-full">
       {/* Chat Header */}
-      <div className="bg-primary text-primary-foreground p-4 flex items-center gap-3">
-        <div className="w-10 h-10 bg-primary-foreground/20 rounded-full flex items-center justify-center">
-          <Bot className="w-6 h-6" />
+      <div className="bg-brand text-brand-foreground p-4 flex items-center gap-3">
+        <div className="w-12 h-12 bg-brand-foreground/10 rounded-full flex items-center justify-center border-2 border-brand-foreground/20">
+          <div className="w-8 h-8 bg-brand-foreground rounded-full flex items-center justify-center">
+            <span className="text-brand text-xs font-bold">EBL</span>
+          </div>
         </div>
-        <div>
-          <h1 className="text-xl font-semibold">AskEBL Assistant</h1>
-          <p className="text-sm opacity-90">Eastern Bank FAQ Chatbot</p>
+        <div className="flex-1">
+          <h1 className="text-xl font-semibold">AskEBL - Banking Assistant</h1>
+          <p className="text-sm opacity-90">Eastern Bank Limited • Independent University Bangladesh</p>
+        </div>
+        <div className="w-10 h-10 bg-brand-foreground/10 rounded-full flex items-center justify-center">
+          <span className="text-brand-foreground text-xs font-bold">IUB</span>
         </div>
       </div>
 
@@ -174,10 +179,10 @@ Please try asking about any of these topics, or contact our customer service at 
         <h3 className="text-sm font-medium mb-3">Quick Questions:</h3>
         <div className="flex flex-wrap gap-2">
           {[
-            "What is the ATM limit?",
+            "What are the card services?",
             "Bank operating hours?",
             "How to check balance?",
-            "Interest rates?",
+            "Foreign exchange rates?",
             "How to apply for loan?"
           ].map((question) => (
             <Button

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BankingSidebar } from "./BankingSidebar";
 import { ChatBot } from "./ChatBot";
+import { UserCreationGuide } from "./UserCreationGuide";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -230,7 +231,16 @@ export function BankingDashboard() {
   return (
     <div className="flex h-screen bg-background">
       <BankingSidebar onInfoClick={handleInfoClick} />
-      <ChatBot initialMessage={chatMessage} />
+      <div className="flex-1 flex flex-col">
+        <div className="p-4 border-b bg-background flex justify-between items-center">
+          <div>
+            <h2 className="text-lg font-semibold text-brand">AskEBL - Banking Assistant</h2>
+            <p className="text-sm text-muted-foreground">Eastern Bank Limited Dashboard</p>
+          </div>
+          <UserCreationGuide />
+        </div>
+        <ChatBot initialMessage={chatMessage} />
+      </div>
       
       <Dialog open={!!infoDialog} onOpenChange={() => setInfoDialog(null)}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">

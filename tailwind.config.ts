@@ -77,6 +77,11 @@ export default {
 				brand: {
 					DEFAULT: 'hsl(var(--brand))',
 					foreground: 'hsl(var(--brand-foreground))'
+				},
+				ebl: {
+					green: 'hsl(var(--ebl-green))',
+					'light-green': 'hsl(var(--ebl-light-green))',
+					'dark-green': 'hsl(var(--ebl-dark-green))'
 				}
 			},
 			borderRadius: {
