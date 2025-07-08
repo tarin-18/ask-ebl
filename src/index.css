@@ -17,8 +17,8 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* EBL Green Brand Colors */
-    --primary: 142 69% 22%;
+    /* EBL Primary - Green */
+    --primary: 142 65% 25%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96.1%;
@@ -27,7 +27,8 @@ All colors MUST be HSL.
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 142 69% 22%;
+    /* EBL Accent - Blue */
+    --accent: 214 85% 35%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -35,37 +36,34 @@ All colors MUST be HSL.
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 142 69% 22%;
+    --ring: 142 65% 25%;
 
     --radius: 0.5rem;
 
-    /* EBL specific colors */
+    /* EBL Banking specific colors */
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
     --warning: 45 93% 47%;
     --warning-foreground: 0 0% 100%;
-    --info: 217 91% 60%;
+    --info: 214 85% 45%;
     --info-foreground: 0 0% 100%;
-    --brand: 142 69% 22%;
+    --brand: 142 65% 25%;
     --brand-foreground: 0 0% 100%;
-    --ebl-green: 142 69% 22%;
-    --ebl-light-green: 142 69% 45%;
-    --ebl-dark-green: 142 69% 15%;
+    
+    /* EBL Color Palette */
+    --ebl-green: 142 65% 25%;
+    --ebl-green-light: 142 55% 35%;
+    --ebl-blue: 214 85% 35%;
+    --ebl-blue-light: 214 75% 45%;
+    --ebl-gold: 45 85% 55%;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -79,9 +77,9 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    /* EBL Green Brand Colors - Dark Mode */
-    --primary: 142 69% 35%;
-    --primary-foreground: 0 0% 100%;
+    /* EBL Primary - Green (Dark) */
+    --primary: 142 55% 45%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -89,28 +87,34 @@ All colors MUST be HSL.
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 142 69% 35%;
-    --accent-foreground: 0 0% 100%;
+    /* EBL Accent - Blue (Dark) */
+    --accent: 214 75% 55%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 142 69% 35%;
+    --ring: 142 55% 45%;
 
-    /* EBL specific colors - dark mode */
+    /* EBL Banking specific colors - dark mode */
     --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
     --warning: 45 93% 55%;
     --warning-foreground: 0 0% 0%;
-    --info: 217 91% 70%;
+    --info: 214 75% 55%;
     --info-foreground: 0 0% 0%;
-    --brand: 142 69% 35%;
-    --brand-foreground: 0 0% 100%;
-    --ebl-green: 142 69% 35%;
-    --ebl-light-green: 142 69% 50%;
-    --ebl-dark-green: 142 69% 20%;
+    --brand: 142 55% 45%;
+    --brand-foreground: 0 0% 0%;
+    
+    /* EBL Color Palette - Dark */
+    --ebl-green: 142 55% 45%;
+    --ebl-green-light: 142 65% 55%;
+    --ebl-blue: 214 75% 55%;
+    --ebl-blue-light: 214 85% 65%;
+    --ebl-gold: 45 85% 65%;
+    
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

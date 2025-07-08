@@ -80,8 +80,10 @@ export default {
 				},
 				ebl: {
 					green: 'hsl(var(--ebl-green))',
-					'light-green': 'hsl(var(--ebl-light-green))',
-					'dark-green': 'hsl(var(--ebl-dark-green))'
+					'green-light': 'hsl(var(--ebl-green-light))',
+					blue: 'hsl(var(--ebl-blue))',
+					'blue-light': 'hsl(var(--ebl-blue-light))',
+					gold: 'hsl(var(--ebl-gold))'
 				}
 			},
 			borderRadius: {
