@@ -167,10 +167,7 @@ Please try asking about any of these topics, or contact our customer service at 
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-semibold">AskEBL - Banking Assistant</h1>
-          <p className="text-sm opacity-90">Eastern Bank Limited • Independent University Bangladesh</p>
-        </div>
-        <div className="w-10 h-10 bg-brand-foreground/10 rounded-full flex items-center justify-center">
-          <span className="text-brand-foreground text-xs font-bold">IUB</span>
+          <p className="text-sm opacity-90">Eastern Bank PLC</p>
         </div>
       </div>
 

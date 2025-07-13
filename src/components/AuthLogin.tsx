@@ -35,7 +35,7 @@ export function AuthLogin({ onLogin }: AuthLoginProps) {
 
     // Simple demo validation - in real app this would be server-side
     // Demo user IDs: 12345, 67890, 11111, 22222, 33333
-    const validUsers = ["12345", "67890", "11111", "22222", "33333"];
+    const validUsers = ["12345", "67890", "11111", "22222", "33333", "55555"];
     const demoPassword = "demo123";
 
     if (validUsers.includes(userId) && password === demoPassword) {
@@ -63,15 +63,15 @@ export function AuthLogin({ onLogin }: AuthLoginProps) {
             alignItems: 'center', 
             justifyContent: 'center', 
             gap: '8px',
-            color: '#1a5f3f',
+            color: '#06014b',
             fontSize: '24px',
             marginBottom: '8px'
           }}>
             <LogIn style={{ width: '24px', height: '24px' }} />
             Login to AskEBL
           </CardTitle>
-          <p style={{ color: '#6b7280', fontSize: '14px' }}>
-            Eastern Bank Limited Banking Assistant
+          <p style={{ color: '#06014b', fontSize: '14px' }}>
+            Eastern Bank PLC Banking Assistant
           </p>
         </CardHeader>
         <CardContent>
@@ -170,7 +170,7 @@ export function AuthLogin({ onLogin }: AuthLoginProps) {
               Demo Credentials:
             </p>
             <p style={{ fontSize: '12px', color: '#374151' }}>
-              User ID: 12345, 67890, 11111, 22222, or 33333<br/>
+              User ID: 12345, 67890, 11111, 22222, 33333 or 55555<br/>
               Password: demo123
             </p>
           </div>
