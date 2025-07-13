@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronRight, DollarSign, CreditCard, TrendingUp, History, HelpCircle } from "lucide-react";
+import { ChevronRight, DollarSign, CreditCard, TrendingUp, History, HelpCircle, LogOut } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -7,12 +7,14 @@ import { useProfile, useLoans, useTransactions } from "@/hooks/useBankingData";
 
 interface BankingSidebarProps {
   onInfoClick: (type: string, data: any) => void;
+  userLoginId: string | null;
+  onLogout: () => void;
 }
 
-export function BankingSidebar({ onInfoClick }: BankingSidebarProps) {
-  const { data: profile, isLoading: profileLoading } = useProfile();
-  const { data: loans, isLoading: loansLoading } = useLoans();
-  const { data: transactions, isLoading: transactionsLoading } = useTransactions(5);
+export function BankingSidebar({ onInfoClick, userLoginId, onLogout }: BankingSidebarProps) {
+  const { data: profile, isLoading: profileLoading } = useProfile(userLoginId);
+  const { data: loans, isLoading: loansLoading } = useLoans(userLoginId);
+  const { data: transactions, isLoading: transactionsLoading } = useTransactions(userLoginId, 5);
   
   const [openSections, setOpenSections] = useState<string[]>(['balance']);
 
@@ -32,67 +34,169 @@ export function BankingSidebar({ onInfoClick }: BankingSidebarProps) {
     return new Date(dateString).toLocaleDateString('en-BD');
   };
 
+  if (!userLoginId) {
+    return (
+      <div style={{ 
+        width: '320px', 
+        backgroundColor: '#ffffff', 
+        borderRight: '1px solid #e5e7eb', 
+        padding: '20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          color: '#6b7280',
+          fontSize: '16px'
+        }}>
+          Please login to your account
+        </div>
+      </div>
+    );
+  }
+
   if (profileLoading) {
     return (
-      <div className="w-80 bg-sidebar border-r border-sidebar-border p-4">
-        <div className="animate-pulse space-y-4">
-          <div className="h-20 bg-muted rounded"></div>
-          <div className="h-16 bg-muted rounded"></div>
-          <div className="h-16 bg-muted rounded"></div>
+      <div style={{ 
+        width: '320px', 
+        backgroundColor: '#ffffff', 
+        borderRight: '1px solid #e5e7eb', 
+        padding: '20px'
+      }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ height: '80px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}></div>
+          <div style={{ height: '64px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}></div>
+          <div style={{ height: '64px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-80 bg-sidebar border-r border-sidebar-border overflow-y-auto">
-      <div className="p-4 border-b border-sidebar-border">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-primary-foreground font-semibold">
+    <div style={{ 
+      width: '320px', 
+      backgroundColor: '#ffffff', 
+      borderRight: '1px solid #e5e7eb', 
+      overflowY: 'auto'
+    }}>
+      <div style={{ 
+        padding: '20px', 
+        borderBottom: '1px solid #e5e7eb',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ 
+            width: '40px', 
+            height: '40px', 
+            backgroundColor: '#1a5f3f', 
+            borderRadius: '50%', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center'
+          }}>
+            <span style={{ color: 'white', fontWeight: '600', fontSize: '16px' }}>
               {profile?.full_name?.charAt(0) || 'U'}
             </span>
           </div>
           <div>
-            <h2 className="font-semibold text-sidebar-foreground">{profile?.full_name || 'Demo User'}</h2>
-            <p className="text-sm text-sidebar-foreground/70">A/C: {profile?.account_number}</p>
+            <h2 style={{ 
+              fontWeight: '600', 
+              color: '#1f2937', 
+              fontSize: '16px',
+              margin: '0 0 4px 0'
+            }}>
+              {profile?.full_name || 'Demo User'}
+            </h2>
+            <p style={{ 
+              fontSize: '12px', 
+              color: '#6b7280',
+              margin: '0'
+            }}>
+              A/C: {profile?.account_number}
+            </p>
           </div>
         </div>
+        <Button
+          onClick={onLogout}
+          style={{
+            backgroundColor: 'transparent',
+            border: '1px solid #d1d5db',
+            color: '#6b7280',
+            padding: '6px',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          title="Logout"
+        >
+          <LogOut style={{ width: '16px', height: '16px' }} />
+        </Button>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {/* Account Balance */}
-        <Card>
+        <Card style={{ 
+          border: '1px solid #e5e7eb', 
+          borderRadius: '8px', 
+          backgroundColor: '#ffffff' 
+        }}>
           <Collapsible 
             open={openSections.includes('balance')} 
             onOpenChange={() => toggleSection('balance')}
           >
             <CollapsibleTrigger asChild>
-              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <CardTitle className="flex items-center justify-between text-base">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-success" />
+              <CardHeader style={{ 
+                cursor: 'pointer', 
+                padding: '16px',
+                borderBottom: openSections.includes('balance') ? '1px solid #e5e7eb' : 'none'
+              }}>
+                <CardTitle style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between', 
+                  fontSize: '16px',
+                  margin: 0
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <DollarSign style={{ width: '16px', height: '16px', color: '#10b981' }} />
                     My Balance
                   </div>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${openSections.includes('balance') ? 'rotate-90' : ''}`} />
+                  <ChevronRight style={{ 
+                    width: '16px', 
+                    height: '16px',
+                    transform: openSections.includes('balance') ? 'rotate(90deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s'
+                  }} />
                 </CardTitle>
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="pt-0 space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Current A/C</span>
-                  <span className="font-semibold text-success">{formatCurrency(profile?.balance || 0)}</span>
+              <CardContent style={{ paddingTop: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '14px', color: '#6b7280' }}>Current A/C</span>
+                  <span style={{ fontWeight: '600', color: '#10b981' }}>{formatCurrency(profile?.balance || 0)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Savings A/C</span>
-                  <span className="font-semibold text-success">{formatCurrency(profile?.savings_balance || 0)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '14px', color: '#6b7280' }}>Savings A/C</span>
+                  <span style={{ fontWeight: '600', color: '#10b981' }}>{formatCurrency(profile?.savings_balance || 0)}</span>
                 </div>
                 <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full" 
                   onClick={() => onInfoClick('balance', profile)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 16px',
+                    backgroundColor: 'transparent',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}
                 >
                   View Details
                 </Button>

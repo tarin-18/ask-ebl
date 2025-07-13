@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { BankingSidebar } from "./BankingSidebar";
 import { ChatBot } from "./ChatBot";
-import { UserCreationGuide } from "./UserCreationGuide";
+import { AuthLogin } from "./AuthLogin";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,13 +15,30 @@ interface InfoDialogData {
 export function BankingDashboard() {
   const [infoDialog, setInfoDialog] = useState<InfoDialogData | null>(null);
   const [chatMessage, setChatMessage] = useState<string>('');
+  const [userLoginId, setUserLoginId] = useState<string | null>(null);
 
   const handleInfoClick = (type: string, data: any) => {
+    if (!userLoginId) {
+      setChatMessage('Please login to your account to access banking information.');
+      return;
+    }
+    
     if (type === 'help') {
       setChatMessage(data.message);
       return;
     }
     setInfoDialog({ type, data });
+  };
+
+  const handleLogin = (loginId: string) => {
+    setUserLoginId(loginId);
+    setChatMessage('Welcome! How can I assist you today?');
+  };
+
+  const handleLogout = () => {
+    setUserLoginId(null);
+    setInfoDialog(null);
+    setChatMessage('');
   };
 
   const formatCurrency = (amount: number) => {
@@ -228,16 +245,43 @@ export function BankingDashboard() {
     }
   };
 
+  if (!userLoginId) {
+    return <AuthLogin onLogin={handleLogin} />;
+  }
+
   return (
-    <div className="flex h-screen bg-background">
-      <BankingSidebar onInfoClick={handleInfoClick} />
-      <div className="flex-1 flex flex-col">
-        <div className="p-4 border-b bg-background flex justify-between items-center">
+    <div style={{ display: 'flex', height: '100vh', backgroundColor: '#ffffff' }}>
+      <BankingSidebar 
+        onInfoClick={handleInfoClick} 
+        userLoginId={userLoginId}
+        onLogout={handleLogout}
+      />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ 
+          padding: '20px', 
+          borderBottom: '1px solid #e5e7eb', 
+          backgroundColor: '#ffffff',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
           <div>
-            <h2 className="text-lg font-semibold text-brand">AskEBL - Banking Assistant</h2>
-            <p className="text-sm text-muted-foreground">Eastern Bank Limited Dashboard</p>
+            <h2 style={{ 
+              fontSize: '20px', 
+              fontWeight: '600', 
+              color: '#1a5f3f',
+              margin: '0 0 4px 0'
+            }}>
+              AskEBL - Banking Assistant
+            </h2>
+            <p style={{ 
+              fontSize: '14px', 
+              color: '#6b7280',
+              margin: '0'
+            }}>
+              Eastern Bank Limited Dashboard
+            </p>
           </div>
-          <UserCreationGuide />
         </div>
         <ChatBot initialMessage={chatMessage} />
       </div>
