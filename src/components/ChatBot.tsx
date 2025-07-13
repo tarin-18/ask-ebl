@@ -221,8 +221,8 @@ Please try asking about any of these topics, or contact our customer service at 
               </div>
               <div className={`rounded-lg p-3 ${
                 message.sender === 'user'
-                  ? 'bg-primary text-primary-foreground ml-2'
-                  : 'bg-card border mr-2'
+                  ? 'bg-blue-600 text-white ml-2'
+                  : 'bg-gray-100 text-gray-900 border mr-2'
               }`}>
                 <div className="text-sm">
                   {formatMessageText(message.text)}
