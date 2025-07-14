@@ -87,6 +87,8 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          login_id: string | null
+          password: string | null
           savings_balance: number | null
           updated_at: string
           user_id: string
@@ -97,6 +99,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          login_id?: string | null
+          password?: string | null
           savings_balance?: number | null
           updated_at?: string
           user_id: string
@@ -107,6 +111,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          login_id?: string | null
+          password?: string | null
           savings_balance?: number | null
           updated_at?: string
           user_id?: string

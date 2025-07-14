@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LogIn } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthLoginProps {
   onLogin: (userId: string) => void;
@@ -33,18 +34,26 @@ export function AuthLogin({ onLogin }: AuthLoginProps) {
       return;
     }
 
-    // Simple demo validation - in real app this would be server-side
-    // Demo user IDs: 12345, 67890, 11111, 22222, 33333
-    const validUsers = ["12345", "67890", "11111", "22222", "33333", "55555"];
-    const demoPassword = "demo123";
+    try {
+      // Query the database for user authentication
+      const { data: user, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('login_id', userId)
+        .eq('password', password)
+        .single();
 
-    if (validUsers.includes(userId) && password === demoPassword) {
+      if (error || !user) {
+        setError("Invalid user ID or password");
+        setIsLoading(false);
+        return;
+      }
+
       onLogin(userId);
-    } else {
-      setError("Invalid user ID or password");
+    } catch (err) {
+      setError("Login failed. Please try again.");
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -71,7 +80,7 @@ export function AuthLogin({ onLogin }: AuthLoginProps) {
             Login to AskEBL
           </CardTitle>
           <p style={{ color: '#06014b', fontSize: '14px' }}>
-            Eastern Bank PLC Banking Assistant
+            Banking Assistant
           </p>
         </CardHeader>
         <CardContent>
@@ -160,20 +169,6 @@ export function AuthLogin({ onLogin }: AuthLoginProps) {
             </Button>
           </form>
 
-          <div style={{ 
-            marginTop: '20px', 
-            padding: '12px', 
-            backgroundColor: '#f3f4f6', 
-            borderRadius: '6px' 
-          }}>
-            <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px', fontWeight: '500' }}>
-              Demo Credentials:
-            </p>
-            <p style={{ fontSize: '12px', color: '#374151' }}>
-              User ID: 12345, 67890, 11111, 22222, 33333 or 55555<br/>
-              Password: demo123
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

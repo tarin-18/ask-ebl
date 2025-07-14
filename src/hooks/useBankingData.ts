@@ -1,13 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-// Map 5-digit user IDs to actual database user IDs
-const USER_ID_MAP: Record<string, string> = {
-  '12345': '12345678-1234-1234-1234-123456789012',
-  '67890': '87654321-4321-4321-4321-210987654321',
-  '11111': '11111111-1111-1111-1111-111111111111',
-  '22222': '22222222-2222-2222-2222-222222222222',
-  '33333': '33333333-3333-3333-3333-333333333333'
+// Get user ID from login_id in database
+const getUserIdFromLoginId = async (loginId: string): Promise<string | null> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('user_id')
+    .eq('login_id', loginId)
+    .single();
+  
+  if (error || !data) return null;
+  return data.user_id;
 };
 
 export interface Profile {
@@ -57,21 +60,20 @@ export function useProfile(userLoginId: string | null) {
   return useQuery({
     queryKey: ['profile', userLoginId],
     queryFn: async () => {
-      if (!userLoginId || !USER_ID_MAP[userLoginId]) {
+      if (!userLoginId) {
         throw new Error('Invalid user ID');
       }
       
-      const dbUserId = USER_ID_MAP[userLoginId];
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', dbUserId)
+        .eq('login_id', userLoginId)
         .single();
       
       if (error) throw error;
       return data as Profile;
     },
-    enabled: !!userLoginId && !!USER_ID_MAP[userLoginId]
+    enabled: !!userLoginId
   });
 }
 
@@ -79,21 +81,23 @@ export function useLoans(userLoginId: string | null) {
   return useQuery({
     queryKey: ['loans', userLoginId],
     queryFn: async () => {
-      if (!userLoginId || !USER_ID_MAP[userLoginId]) {
+      if (!userLoginId) {
         throw new Error('Invalid user ID');
       }
       
-      const dbUserId = USER_ID_MAP[userLoginId];
+      const userId = await getUserIdFromLoginId(userLoginId);
+      if (!userId) throw new Error('User not found');
+      
       const { data, error } = await supabase
         .from('loans')
         .select('*')
-        .eq('user_id', dbUserId)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
       return data as Loan[];
     },
-    enabled: !!userLoginId && !!USER_ID_MAP[userLoginId]
+    enabled: !!userLoginId
   });
 }
 
@@ -101,22 +105,24 @@ export function useTransactions(userLoginId: string | null, limit = 10) {
   return useQuery({
     queryKey: ['transactions', userLoginId, limit],
     queryFn: async () => {
-      if (!userLoginId || !USER_ID_MAP[userLoginId]) {
+      if (!userLoginId) {
         throw new Error('Invalid user ID');
       }
       
-      const dbUserId = USER_ID_MAP[userLoginId];
+      const userId = await getUserIdFromLoginId(userLoginId);
+      if (!userId) throw new Error('User not found');
+      
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
-        .eq('user_id', dbUserId)
+        .eq('user_id', userId)
         .order('transaction_date', { ascending: false })
         .limit(limit);
       
       if (error) throw error;
       return data as Transaction[];
     },
-    enabled: !!userLoginId && !!USER_ID_MAP[userLoginId]
+    enabled: !!userLoginId
   });
 }
 

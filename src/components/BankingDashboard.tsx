@@ -279,7 +279,7 @@ export function BankingDashboard() {
               color: '#6b7280',
               margin: '0'
             }}>
-              Eastern Bank Limited Dashboard
+              Banking Dashboard
             </p>
           </div>
         </div>
