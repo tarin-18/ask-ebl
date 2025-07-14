@@ -141,10 +141,9 @@ export function BankingSidebar({ onInfoClick, userLoginId, onLogout }: BankingSi
 
       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {/* Account Balance */}
-        <Card style={{ 
-          border: '1px solid #e5e7eb', 
-          borderRadius: '8px', 
-          backgroundColor: '#ffffff' 
+        <Card className="bg-warning/10 border-warning/20"
+        style={{ 
+          borderRadius: '8px'
         }}>
           <Collapsible 
             open={openSections.includes('balance')} 

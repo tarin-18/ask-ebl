@@ -23,7 +23,7 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: initialMessage || 'Hello! I\'m AskEBL, your Eastern Bank assistant. How can I help you today?',
+      text: initialMessage || 'Hello! I\'m AskEBL, your banking assistant. How can I help you today?',
       sender: 'bot',
       timestamp: new Date()
     }
@@ -161,13 +161,15 @@ Please try asking about any of these topics, or contact our customer service at 
       {/* Chat Header */}
       <div className="bg-brand text-brand-foreground p-4 flex items-center gap-3">
         <div className="w-12 h-12 bg-brand-foreground/10 rounded-full flex items-center justify-center border-2 border-brand-foreground/20">
-          <div className="w-8 h-8 bg-brand-foreground rounded-full flex items-center justify-center">
-            <span className="text-brand text-xs font-bold">EBL</span>
-          </div>
+          <img 
+            src="/src/assets/chat head.jpeg" 
+            alt="AskEBL Chat Head" 
+            className="w-8 h-8 rounded-full object-cover"
+          />
         </div>
         <div className="flex-1">
-          <h1 className="text-xl font-semibold">AskEBL - Banking Assistant</h1>
-          <p className="text-sm opacity-90">Eastern Bank PLC</p>
+          <h1 className="text-xl font-semibold">AskEBL</h1>
+          <p className="text-sm opacity-90">Your Banking Assistant</p>
         </div>
       </div>
 
@@ -261,7 +263,7 @@ Please try asking about any of these topics, or contact our customer service at 
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask me anything about Eastern Bank..."
+            placeholder="Ask me anything about banking..."
             className="flex-1"
           />
           <Button 

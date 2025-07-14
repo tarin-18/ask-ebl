@@ -257,32 +257,6 @@ export function BankingDashboard() {
         onLogout={handleLogout}
       />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ 
-          padding: '20px', 
-          borderBottom: '1px solid #e5e7eb', 
-          backgroundColor: '#ffffff',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <div>
-            <h2 style={{ 
-              fontSize: '20px', 
-              fontWeight: '600', 
-              color: '#1a5f3f',
-              margin: '0 0 4px 0'
-            }}>
-              AskEBL - Banking Assistant
-            </h2>
-            <p style={{ 
-              fontSize: '14px', 
-              color: '#6b7280',
-              margin: '0'
-            }}>
-              Banking Dashboard
-            </p>
-          </div>
-        </div>
         <ChatBot initialMessage={chatMessage} />
       </div>
       
