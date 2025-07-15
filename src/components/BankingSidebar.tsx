@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronRight, DollarSign, CreditCard, TrendingUp, History, HelpCircle, ChevronDown } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -18,14 +19,22 @@ export function BankingSidebar({ onInfoClick, userLoginId, onAccountSwitch }: Ba
   const { data: transactions, isLoading: transactionsLoading } = useTransactions(userLoginId, 5);
   
   const [openSections, setOpenSections] = useState<string[]>(['balance']);
+  const [availableUsers, setAvailableUsers] = useState<any[]>([]);
 
-  // Available demo accounts
-  const demoAccounts = [
-    { id: "10001", name: "John Doe", accountNumber: "ACC-001" },
-    { id: "10002", name: "Jane Smith", accountNumber: "ACC-002" },
-    { id: "10003", name: "Mike Johnson", accountNumber: "ACC-003" },
-    { id: "10004", name: "Sarah Wilson", accountNumber: "ACC-004" }
-  ];
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('login_id, full_name, account_number')
+        .order('full_name');
+      
+      if (data && !error) {
+        setAvailableUsers(data);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const toggleSection = (section: string) => {
     setOpenSections(prev => 
@@ -144,7 +153,7 @@ export function BankingSidebar({ onInfoClick, userLoginId, onAccountSwitch }: Ba
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
-            {demoAccounts.map((account) => (
+            {availableUsers.map((account) => (
               <DropdownMenuItem
                 key={account.id}
                 onClick={() => onAccountSwitch(account.id)}
