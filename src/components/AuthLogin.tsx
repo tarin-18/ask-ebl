@@ -41,7 +41,7 @@ export function AuthLogin({ onLogin }: AuthLoginProps) {
         .select('*')
         .eq('login_id', userId)
         .eq('password', password)
-        .single();
+        .maybeSingle();
 
       if (error || !user) {
         setError("Invalid user ID or password");
