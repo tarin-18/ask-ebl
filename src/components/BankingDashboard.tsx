@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { BankingSidebar } from "./BankingSidebar";
 import { ChatBot } from "./ChatBot";
-import { AuthLogin } from "./AuthLogin";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,14 +14,9 @@ interface InfoDialogData {
 export function BankingDashboard() {
   const [infoDialog, setInfoDialog] = useState<InfoDialogData | null>(null);
   const [chatMessage, setChatMessage] = useState<string>('');
-  const [userLoginId, setUserLoginId] = useState<string | null>(null);
+  const [userLoginId, setUserLoginId] = useState<string | null>("10001"); // Default user
 
   const handleInfoClick = (type: string, data: any) => {
-    if (!userLoginId) {
-      setChatMessage('Please login to your account to access banking information.');
-      return;
-    }
-    
     if (type === 'help') {
       setChatMessage(data.message);
       return;
@@ -30,15 +24,10 @@ export function BankingDashboard() {
     setInfoDialog({ type, data });
   };
 
-  const handleLogin = (loginId: string) => {
+  const handleAccountSwitch = (loginId: string) => {
     setUserLoginId(loginId);
-    setChatMessage('Welcome! How can I assist you today?');
-  };
-
-  const handleLogout = () => {
-    setUserLoginId(null);
     setInfoDialog(null);
-    setChatMessage('');
+    setChatMessage(`Switched to account ${loginId}. How can I assist you today?`);
   };
 
   const formatCurrency = (amount: number) => {
@@ -245,16 +234,12 @@ export function BankingDashboard() {
     }
   };
 
-  if (!userLoginId) {
-    return <AuthLogin onLogin={handleLogin} />;
-  }
-
   return (
     <div style={{ display: 'flex', height: '100vh', backgroundColor: '#ffffff' }}>
       <BankingSidebar 
         onInfoClick={handleInfoClick} 
         userLoginId={userLoginId}
-        onLogout={handleLogout}
+        onAccountSwitch={handleAccountSwitch}
       />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <ChatBot initialMessage={chatMessage} />

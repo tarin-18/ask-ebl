@@ -1,22 +1,31 @@
 import { useState } from "react";
-import { ChevronRight, DollarSign, CreditCard, TrendingUp, History, HelpCircle, LogOut } from "lucide-react";
+import { ChevronRight, DollarSign, CreditCard, TrendingUp, History, HelpCircle, ChevronDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useProfile, useLoans, useTransactions } from "@/hooks/useBankingData";
 
 interface BankingSidebarProps {
   onInfoClick: (type: string, data: any) => void;
   userLoginId: string | null;
-  onLogout: () => void;
+  onAccountSwitch: (loginId: string) => void;
 }
 
-export function BankingSidebar({ onInfoClick, userLoginId, onLogout }: BankingSidebarProps) {
+export function BankingSidebar({ onInfoClick, userLoginId, onAccountSwitch }: BankingSidebarProps) {
   const { data: profile, isLoading: profileLoading } = useProfile(userLoginId);
   const { data: loans, isLoading: loansLoading } = useLoans(userLoginId);
   const { data: transactions, isLoading: transactionsLoading } = useTransactions(userLoginId, 5);
   
   const [openSections, setOpenSections] = useState<string[]>(['balance']);
+
+  // Available demo accounts
+  const demoAccounts = [
+    { id: "10001", name: "John Doe", accountNumber: "ACC-001" },
+    { id: "10002", name: "Jane Smith", accountNumber: "ACC-002" },
+    { id: "10003", name: "Mike Johnson", accountNumber: "ACC-003" },
+    { id: "10004", name: "Sarah Wilson", accountNumber: "ACC-004" }
+  ];
 
   const toggleSection = (section: string) => {
     setOpenSections(prev => 
@@ -88,55 +97,77 @@ export function BankingSidebar({ onInfoClick, userLoginId, onLogout }: BankingSi
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ 
-            width: '40px', 
-            height: '40px', 
-            backgroundColor: '#1a5f3f', 
-            borderRadius: '50%', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center'
-          }}>
-            <span style={{ color: 'white', fontWeight: '600', fontSize: '16px' }}>
-              {profile?.full_name?.charAt(0) || 'U'}
-            </span>
-          </div>
-          <div>
-            <h2 style={{ 
-              fontWeight: '600', 
-              color: '#1f2937', 
-              fontSize: '16px',
-              margin: '0 0 4px 0'
-            }}>
-              {profile?.full_name || 'Demo User'}
-            </h2>
-            <p style={{ 
-              fontSize: '12px', 
-              color: '#6b7280',
-              margin: '0'
-            }}>
-              A/C: {profile?.account_number}
-            </p>
-          </div>
-        </div>
-        <Button
-          onClick={onLogout}
-          style={{
-            backgroundColor: 'transparent',
-            border: '1px solid #d1d5db',
-            color: '#6b7280',
-            padding: '6px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-          title="Logout"
-        >
-          <LogOut style={{ width: '16px', height: '16px' }} />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px', 
+              cursor: 'pointer',
+              padding: '4px',
+              borderRadius: '8px',
+              transition: 'background-color 0.2s'
+            }}
+            className="hover:bg-muted"
+            >
+              <div style={{ 
+                width: '40px', 
+                height: '40px', 
+                backgroundColor: '#1a5f3f', 
+                borderRadius: '50%', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center'
+              }}>
+                <span style={{ color: 'white', fontWeight: '600', fontSize: '16px' }}>
+                  {profile?.full_name?.charAt(0) || 'U'}
+                </span>
+              </div>
+              <div style={{ flex: 1 }}>
+                <h2 style={{ 
+                  fontWeight: '600', 
+                  color: '#1f2937', 
+                  fontSize: '16px',
+                  margin: '0 0 4px 0'
+                }}>
+                  {profile?.full_name || 'Demo User'}
+                </h2>
+                <p style={{ 
+                  fontSize: '12px', 
+                  color: '#6b7280',
+                  margin: '0'
+                }}>
+                  A/C: {profile?.account_number}
+                </p>
+              </div>
+              <ChevronDown style={{ width: '16px', height: '16px', color: '#6b7280' }} />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            {demoAccounts.map((account) => (
+              <DropdownMenuItem
+                key={account.id}
+                onClick={() => onAccountSwitch(account.id)}
+                className={userLoginId === account.id ? "bg-muted" : ""}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-semibold">
+                      {account.name.charAt(0)}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="font-medium">{account.name}</div>
+                    <div className="text-sm text-muted-foreground">{account.accountNumber}</div>
+                  </div>
+                  {userLoginId === account.id && (
+                    <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
+                  )}
+                </div>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
