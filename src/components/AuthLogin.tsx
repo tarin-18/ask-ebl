@@ -35,6 +35,8 @@ export function AuthLogin({ onLogin }: AuthLoginProps) {
     }
 
     try {
+      console.log('Attempting login with:', { userId, password });
+      
       // Query the database for user authentication
       const { data: user, error } = await supabase
         .from('profiles')
@@ -43,14 +45,25 @@ export function AuthLogin({ onLogin }: AuthLoginProps) {
         .eq('password', password)
         .maybeSingle();
 
-      if (error || !user) {
+      console.log('Database response:', { user, error });
+
+      if (error) {
+        console.error('Database error:', error);
+        setError(`Database error: ${error.message}`);
+        setIsLoading(false);
+        return;
+      }
+
+      if (!user) {
         setError("Invalid user ID or password");
         setIsLoading(false);
         return;
       }
 
+      console.log('Login successful for user:', user);
       onLogin(userId);
     } catch (err) {
+      console.error('Login exception:', err);
       setError("Login failed. Please try again.");
       setIsLoading(false);
     }
