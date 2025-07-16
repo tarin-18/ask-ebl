@@ -14,7 +14,7 @@ interface InfoDialogData {
 export function BankingDashboard() {
   const [infoDialog, setInfoDialog] = useState<InfoDialogData | null>(null);
   const [chatMessage, setChatMessage] = useState<string>('');
-  const [userLoginId, setUserLoginId] = useState<string | null>("10001"); // Default user
+  const [userLoginId, setUserLoginId] = useState<string | null>("10001"); // Set to first available user from database
 
   const handleInfoClick = (type: string, data: any) => {
     if (type === 'help') {

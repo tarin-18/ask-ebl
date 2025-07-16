@@ -34,6 +34,22 @@ export function BankingSidebar({ onInfoClick, userLoginId, onAccountSwitch }: Ba
     };
 
     fetchUsers();
+
+    // Set up real-time subscription for profiles table
+    const channel = supabase
+      .channel('profiles-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'profiles'
+      }, () => {
+        fetchUsers(); // Refetch users when changes occur
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const toggleSection = (section: string) => {
@@ -69,7 +85,7 @@ export function BankingSidebar({ onInfoClick, userLoginId, onAccountSwitch }: Ba
           color: '#6b7280',
           fontSize: '16px'
         }}>
-          Please login to your account
+          Please select an account
         </div>
       </div>
     );
@@ -139,7 +155,7 @@ export function BankingSidebar({ onInfoClick, userLoginId, onAccountSwitch }: Ba
                   fontSize: '16px',
                   margin: '0 0 4px 0'
                 }}>
-                  {profile?.full_name || 'Demo User'}
+                  {profile?.full_name || 'User'}
                 </h2>
                 <p style={{ 
                   fontSize: '12px', 
@@ -152,24 +168,24 @@ export function BankingSidebar({ onInfoClick, userLoginId, onAccountSwitch }: Ba
               <ChevronDown style={{ width: '16px', height: '16px', color: '#6b7280' }} />
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
+          <DropdownMenuContent align="start" className="w-56 bg-background border">
             {availableUsers.map((account) => (
               <DropdownMenuItem
-                key={account.id}
-                onClick={() => onAccountSwitch(account.id)}
-                className={userLoginId === account.id ? "bg-muted" : ""}
+                key={account.login_id}
+                onClick={() => onAccountSwitch(account.login_id)}
+                className={userLoginId === account.login_id ? "bg-muted" : ""}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-semibold">
-                      {account.name.charAt(0)}
+                      {account.full_name?.charAt(0) || 'U'}
                     </span>
                   </div>
                   <div>
-                    <div className="font-medium">{account.name}</div>
-                    <div className="text-sm text-muted-foreground">{account.accountNumber}</div>
+                    <div className="font-medium">{account.full_name}</div>
+                    <div className="text-sm text-muted-foreground">{account.account_number}</div>
                   </div>
-                  {userLoginId === account.id && (
+                  {userLoginId === account.login_id && (
                     <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
                   )}
                 </div>

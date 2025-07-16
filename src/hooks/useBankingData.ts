@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 // Get user ID from login_id in database
@@ -57,7 +58,7 @@ export interface FAQ {
 }
 
 export function useProfile(userLoginId: string | null) {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['profile', userLoginId],
     queryFn: async () => {
       if (!userLoginId) {
@@ -75,10 +76,33 @@ export function useProfile(userLoginId: string | null) {
     },
     enabled: !!userLoginId
   });
+
+  // Set up real-time subscription for profile changes
+  useEffect(() => {
+    if (!userLoginId) return;
+    
+    const channel = supabase
+      .channel('profile-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'profiles',
+        filter: `login_id=eq.${userLoginId}`
+      }, () => {
+        query.refetch();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userLoginId, query]);
+
+  return query;
 }
 
 export function useLoans(userLoginId: string | null) {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['loans', userLoginId],
     queryFn: async () => {
       if (!userLoginId) {
@@ -99,10 +123,32 @@ export function useLoans(userLoginId: string | null) {
     },
     enabled: !!userLoginId
   });
+
+  // Set up real-time subscription for loan changes
+  useEffect(() => {
+    if (!userLoginId) return;
+    
+    const channel = supabase
+      .channel('loans-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'loans'
+      }, () => {
+        query.refetch();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userLoginId, query]);
+
+  return query;
 }
 
 export function useTransactions(userLoginId: string | null, limit = 10) {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['transactions', userLoginId, limit],
     queryFn: async () => {
       if (!userLoginId) {
@@ -124,10 +170,32 @@ export function useTransactions(userLoginId: string | null, limit = 10) {
     },
     enabled: !!userLoginId
   });
+
+  // Set up real-time subscription for transaction changes
+  useEffect(() => {
+    if (!userLoginId) return;
+    
+    const channel = supabase
+      .channel('transactions-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'transactions'
+      }, () => {
+        query.refetch();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userLoginId, query]);
+
+  return query;
 }
 
 export function useFAQs() {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['faqs'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -139,4 +207,24 @@ export function useFAQs() {
       return data as FAQ[];
     }
   });
+
+  // Set up real-time subscription for FAQ changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('faqs-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'faqs'
+      }, () => {
+        query.refetch();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [query]);
+
+  return query;
 }

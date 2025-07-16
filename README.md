@@ -1,73 +1,83 @@
-# Welcome to your Lovable project
+# AskEBL - Banking Assistant
 
-## Project info
+A modern banking application with an intelligent chatbot assistant for seamless customer support.
 
-**URL**: https://lovable.dev/projects/cd1602fa-3ef8-49b3-84a4-35735fb562a7
+## Features
 
-## How can I edit this code?
+- Real-time account balance and transaction viewing
+- Interactive banking assistant (AskEBL)
+- Multi-user account switching
+- Loan management and tracking
+- FAQ system with intelligent responses
+- Responsive design for all devices
 
-There are several ways of editing your application.
+## Technologies Used
 
-**Use Lovable**
+- **Frontend**: React, TypeScript, Vite
+- **UI Framework**: shadcn-ui, Tailwind CSS
+- **Backend**: Supabase (Database, Authentication, Real-time)
+- **State Management**: TanStack Query (React Query)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/cd1602fa-3ef8-49b3-84a4-35735fb562a7) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Installation
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to the project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Database Setup
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+This project uses Supabase for backend services. The database includes:
 
-**Use GitHub Codespaces**
+- **profiles**: User account information
+- **transactions**: Transaction history
+- **loans**: Loan details and payment tracking
+- **faqs**: Frequently asked questions for the chatbot
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Project Structure
 
-## What technologies are used for this project?
+```
+src/
+├── components/          # React components
+│   ├── ui/             # shadcn-ui components
+│   ├── BankingDashboard.tsx
+│   ├── BankingSidebar.tsx
+│   └── ChatBot.tsx
+├── hooks/              # Custom React hooks
+├── pages/              # Page components
+└── integrations/       # External service integrations
+```
 
-This project is built with:
+## Development
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+To add new features:
 
-## How can I deploy this project?
+1. **Add new users**: Insert records into the `profiles` table
+2. **Add new FAQs**: Insert records into the `faqs` table with keywords for better matching
+3. **Customize UI**: Modify components in the `src/components` directory
 
-Simply open [Lovable](https://lovable.dev/projects/cd1602fa-3ef8-49b3-84a4-35735fb562a7) and click on Share -> Publish.
+## Deployment
 
-## Can I connect a custom domain to my Lovable project?
+Deploy your application to any hosting platform that supports Node.js applications.
 
-Yes, you can!
+## Contributing
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+1. Create a feature branch
+2. Make your changes
+3. Test thoroughly
+4. Submit a pull request
