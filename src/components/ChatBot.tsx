@@ -144,7 +144,10 @@ Please try asking about any of these topics, or contact our customer service at 
 
   const handleQuickQuestion = (question: string) => {
     setInputText(question);
-    setTimeout(() => handleSendMessage(), 100);
+    // Trigger send after setting the input
+    setTimeout(() => {
+      handleSendMessage();
+    }, 100);
   };
 
   const formatMessageText = (text: string) => {
@@ -157,39 +160,42 @@ Please try asking about any of these topics, or contact our customer service at 
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full">
+    <div className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
       {/* Chat Header */}
-      <div className="bg-brand text-brand-foreground p-4 flex items-center gap-3">
-        <div className="w-12 h-12 bg-brand-foreground/10 rounded-full flex items-center justify-center border-2 border-brand-foreground/20">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 flex items-center gap-4">
+        <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center border-2 border-white/20">
           <img 
             src="/src/assets/chat head.jpeg" 
-            alt="AskEBL Chat Head" 
-            className="w-8 h-8 rounded-full object-cover"
+            alt="EBL Chat Assistant" 
+            className="w-10 h-10 rounded-full object-cover"
           />
         </div>
         <div className="flex-1">
-          <h1 className="text-xl font-semibold">AskEBL</h1>
-          <p className="text-sm opacity-90">Your Banking Assistant</p>
+          <h1 className="text-2xl font-bold">EBL Banking Assistant</h1>
+          <p className="text-blue-100">Get instant help with all your banking needs</p>
         </div>
       </div>
 
       {/* Quick Questions */}
-      <div className="p-4 border-b bg-muted/30">
-        <h3 className="text-sm font-medium mb-3">Quick Questions:</h3>
-        <div className="flex flex-wrap gap-2">
+      <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 border-b">
+        <h3 className="text-sm font-semibold text-gray-700 mb-4">Popular Questions:</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {[
-            "What are the card services?",
-            "Bank operating hours?",
-            "How to check balance?",
-            "Foreign exchange rates?",
-            "How to apply for loan?"
+            "What types of loans do you offer?",
+            "What types of accounts can I open?",
+            "How can I apply for a credit card?",
+            "What are your interest rates?",
+            "How do I activate mobile banking?",
+            "What documents do I need?",
+            "How do I report a lost card?",
+            "What are your service charges?"
           ].map((question) => (
             <Button
               key={question}
               variant="outline"
               size="sm"
               onClick={() => handleQuickQuestion(question)}
-              className="text-xs"
+              className="text-xs p-3 h-auto hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 text-left justify-start"
             >
               {question}
             </Button>
@@ -198,35 +204,37 @@ Please try asking about any of these topics, or contact our customer service at 
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="h-96 overflow-y-auto p-6 space-y-6 bg-gray-50/50">
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            <div className={`flex items-start gap-2 max-w-[80%] ${
+            <div className={`flex items-start gap-3 max-w-[85%] ${
               message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'
             }`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
                 message.sender === 'user' 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'bg-secondary text-secondary-foreground'
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-white text-blue-600 border-2 border-blue-100'
               }`}>
                 {message.sender === 'user' ? (
-                  <User className="w-4 h-4" />
+                  <User className="w-5 h-5" />
                 ) : (
-                  <Bot className="w-4 h-4" />
+                  <Bot className="w-5 h-5" />
                 )}
               </div>
-              <div className={`rounded-lg p-3 ${
+              <div className={`rounded-2xl p-4 shadow-sm max-w-full ${
                 message.sender === 'user'
                   ? 'bg-blue-600 text-white ml-2'
-                  : 'bg-gray-100 text-gray-900 border mr-2'
+                  : 'bg-white text-gray-800 border border-gray-200 mr-2'
               }`}>
-                <div className="text-sm">
+                <div className="text-sm leading-relaxed">
                   {formatMessageText(message.text)}
                 </div>
-                <div className="text-xs opacity-70 mt-1">
+                <div className={`text-xs mt-2 ${
+                  message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                }`}>
                   {message.timestamp.toLocaleTimeString('en-BD', { 
                     hour: '2-digit', 
                     minute: '2-digit' 
@@ -239,14 +247,14 @@ Please try asking about any of these topics, or contact our customer service at 
         
         {isTyping && (
           <div className="flex justify-start">
-            <div className="flex items-start gap-2">
-              <div className="w-8 h-8 bg-secondary text-secondary-foreground rounded-full flex items-center justify-center">
-                <Bot className="w-4 h-4" />
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-white text-blue-600 border-2 border-blue-100 rounded-full flex items-center justify-center shadow-md">
+                <Bot className="w-5 h-5" />
               </div>
-              <div className="bg-card border rounded-lg p-3">
-                <div className="flex items-center gap-1">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm text-muted-foreground">Typing...</span>
+              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                  <span className="text-sm text-gray-600">Typing...</span>
                 </div>
               </div>
             </div>
@@ -257,25 +265,26 @@ Please try asking about any of these topics, or contact our customer service at 
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t bg-background">
-        <div className="flex gap-2">
+      <div className="p-6 border-t bg-gradient-to-r from-gray-50 to-blue-50">
+        <div className="flex gap-3">
           <Input
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask me anything about banking..."
-            className="flex-1"
+            placeholder="Ask me about loans, accounts, credit cards, or any banking service..."
+            className="flex-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl px-4 py-3 text-sm h-12"
+            disabled={isTyping}
           />
           <Button 
             onClick={handleSendMessage} 
             disabled={!inputText.trim() || isTyping}
-            size="icon"
+            className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 py-3 h-12 transition-all duration-200"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-5 h-5" />
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2 text-center">
-          Press Enter to send • Ask about ATM limits, rates, loans, and more!
+        <p className="text-xs text-gray-600 mt-3 text-center">
+          Press Enter to send • Get instant answers to all your banking questions
         </p>
       </div>
 
