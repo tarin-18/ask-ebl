@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useFAQs } from "@/hooks/useBankingData";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   id: string;
@@ -13,6 +14,8 @@ interface Message {
   sender: 'user' | 'bot';
   timestamp: Date;
   isTyping?: boolean;
+  isQuestion?: boolean; // For suggestion prompts
+  originalQuestion?: string; // Store the original question for suggestions
 }
 
 interface ChatBotProps {
@@ -30,6 +33,8 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
   ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const [awaitingSuggestion, setAwaitingSuggestion] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { data: faqs } = useFAQs();
   const { toast } = useToast();
@@ -98,36 +103,116 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputText;
     setInputText('');
     setIsTyping(true);
 
-    // Simulate typing delay
+    // Check if this is a response to a suggestion prompt
+    if (awaitingSuggestion) {
+      const response = currentInput.toLowerCase().trim();
+      if (response === 'yes' || response === 'y') {
+        // Save suggestion to database
+        try {
+          const { error } = await supabase
+            .from('suggested_faqs')
+            .insert({
+              question: awaitingSuggestion,
+              suggested_by_session: sessionId
+            });
+
+          if (error) throw error;
+
+          const botMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            text: "Thank you! Your question has been submitted to our admin team. They will review it and may add it to our FAQ database soon. Is there anything else I can help you with?",
+            sender: 'bot',
+            timestamp: new Date()
+          };
+
+          setTimeout(() => {
+            setMessages(prev => [...prev, botMessage]);
+            setIsTyping(false);
+            setAwaitingSuggestion(null);
+          }, 1000);
+
+          toast({
+            title: "Question Submitted",
+            description: "Your suggestion has been sent to our admin team for review.",
+          });
+
+        } catch (error) {
+          console.error('Error saving suggestion:', error);
+          const botMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            text: "I'm sorry, there was an error submitting your suggestion. Please try again later. Is there anything else I can help you with?",
+            sender: 'bot',
+            timestamp: new Date()
+          };
+
+          setTimeout(() => {
+            setMessages(prev => [...prev, botMessage]);
+            setIsTyping(false);
+            setAwaitingSuggestion(null);
+          }, 1000);
+        }
+
+      } else if (response === 'no' || response === 'n') {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: "No problem! Is there anything else I can help you with? You can ask about loans, accounts, credit cards, or any other banking services.",
+          sender: 'bot',
+          timestamp: new Date()
+        };
+
+        setTimeout(() => {
+          setMessages(prev => [...prev, botMessage]);
+          setIsTyping(false);
+          setAwaitingSuggestion(null);
+        }, 1000);
+
+      } else {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: "Please respond with 'Yes' or 'No' only. Would you like me to suggest your question to our admin team to add to our FAQ database?",
+          sender: 'bot',
+          timestamp: new Date(),
+          isQuestion: true,
+          originalQuestion: awaitingSuggestion
+        };
+
+        setTimeout(() => {
+          setMessages(prev => [...prev, botMessage]);
+          setIsTyping(false);
+        }, 1000);
+      }
+      return;
+    }
+
+    // Normal FAQ processing
     setTimeout(() => {
-      const bestMatch = findBestMatch(inputText);
+      const bestMatch = findBestMatch(currentInput);
       
       let botResponse = '';
       if (bestMatch) {
         botResponse = bestMatch.answer;
+        setAwaitingSuggestion(null);
       } else {
-        botResponse = `I apologize, but I couldn't find a specific answer to your question. Here are some things I can help you with:
+        // No match found - ask for suggestion
+        botResponse = `I apologize, but I couldn't find a specific answer to your question: "${currentInput}"
 
-• ATM withdrawal limits and services
-• Account balance inquiries  
-• Bank operating hours
-• Interest rates information
-• Loan applications and processes
-• Money transfer charges
-• Mobile banking activation
-• Account opening requirements
+Would you like me to suggest this question to our admin team so they can add it to our FAQ database? This will help us serve you and other customers better in the future.
 
-Please try asking about any of these topics, or contact our customer service at 16236 for further assistance.`;
+Please respond with 'Yes' or 'No'.`;
+        setAwaitingSuggestion(currentInput);
       }
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: botResponse,
         sender: 'bot',
-        timestamp: new Date()
+        timestamp: new Date(),
+        isQuestion: !bestMatch,
+        originalQuestion: !bestMatch ? currentInput : undefined
       };
 
       setMessages(prev => [...prev, botMessage]);
@@ -143,6 +228,9 @@ Please try asking about any of these topics, or contact our customer service at 
   };
 
   const handleQuickQuestion = (question: string) => {
+    if (awaitingSuggestion) {
+      setAwaitingSuggestion(null); // Clear any pending suggestion
+    }
     setInputText(question);
     // Trigger send after setting the input
     setTimeout(() => {
@@ -232,6 +320,31 @@ Please try asking about any of these topics, or contact our customer service at 
                 <div className="text-sm leading-relaxed">
                   {formatMessageText(message.text)}
                 </div>
+                {message.isQuestion && awaitingSuggestion && (
+                  <div className="mt-3 flex gap-2">
+                    <Button 
+                      size="sm" 
+                      onClick={() => {
+                        setInputText('Yes');
+                        setTimeout(() => handleSendMessage(), 100);
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 text-xs"
+                    >
+                      Yes
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => {
+                        setInputText('No');
+                        setTimeout(() => handleSendMessage(), 100);
+                      }}
+                      className="border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-1 text-xs"
+                    >
+                      No
+                    </Button>
+                  </div>
+                )}
                 <div className={`text-xs mt-2 ${
                   message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
                 }`}>
@@ -271,7 +384,7 @@ Please try asking about any of these topics, or contact our customer service at 
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask me about loans, accounts, credit cards, or any banking service..."
+            placeholder={awaitingSuggestion ? "Type 'Yes' or 'No' to respond..." : "Ask me about loans, accounts, credit cards, or any banking service..."}
             className="flex-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl px-4 py-3 text-sm h-12"
             disabled={isTyping}
           />
@@ -284,7 +397,10 @@ Please try asking about any of these topics, or contact our customer service at 
           </Button>
         </div>
         <p className="text-xs text-gray-600 mt-3 text-center">
-          Press Enter to send • Get instant answers to all your banking questions
+          {awaitingSuggestion 
+            ? "Please respond with 'Yes' or 'No' only" 
+            : "Press Enter to send • Get instant answers to all your banking questions"
+          }
         </p>
       </div>
 

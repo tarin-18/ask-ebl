@@ -119,6 +119,36 @@ export type Database = {
         }
         Relationships: []
       }
+      suggested_faqs: {
+        Row: {
+          admin_response: string | null
+          approved_at: string | null
+          created_at: string
+          id: string
+          question: string
+          status: string
+          suggested_by_session: string
+        }
+        Insert: {
+          admin_response?: string | null
+          approved_at?: string | null
+          created_at?: string
+          id?: string
+          question: string
+          status?: string
+          suggested_by_session: string
+        }
+        Update: {
+          admin_response?: string | null
+          approved_at?: string | null
+          created_at?: string
+          id?: string
+          question?: string
+          status?: string
+          suggested_by_session?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
