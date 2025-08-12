@@ -17,8 +17,8 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* EBL Primary - Dark Navy Blue */
-    --primary: 210 100% 20%; /* Dark Navy Blue */
+    /* EBL Primary - EBL Blue */
+    --primary: 210 100% 31%; /* EBL Blue #00539B */
     --primary-foreground: 0 0% 100%;
 
     /* EBL Secondary - Light background */
@@ -28,8 +28,8 @@ All colors MUST be HSL.
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    /* EBL Accent - Bright Yellow/Gold */
-    --accent: 48 100% 50%; /* Vivid Gold/Yellow */
+    /* EBL Accent - EBL Yellow */
+    --accent: 48 100% 50%; /* EBL Yellow #FFD200 */
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84.2% 60.2%;
@@ -46,22 +46,22 @@ All colors MUST be HSL.
     --success-foreground: 0 0% 100%;
     --warning: 48 100% 50%; /* Yellow warning */
     --warning-foreground: 0 0% 0%;
-    --info: 210 100% 20%; /* Navy info */
+    --info: 210 100% 31%; /* EBL Blue info */
     --info-foreground: 0 0% 100%;
-    --brand: 210 100% 20%; /* Navy as brand */
+    --brand: 210 100% 31%; /* EBL Blue as brand */
     --brand-foreground: 0 0% 100%;
 
-    /* EBL Color Palette */
-    --ebl-navy: 210 100% 20%;
-    --ebl-navy-light: 210 80% 30%;
-    --ebl-yellow: 48 100% 50%;
+    /* EBL Brand Colors */
+    --ebl-blue: 210 100% 31%; /* #00539B */
+    --ebl-yellow: 48 100% 50%; /* #FFD200 */
+    --ebl-blue-light: 210 80% 40%;
     --ebl-yellow-light: 48 100% 60%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 210 100% 20%;
+    --sidebar-primary: 210 100% 31%; /* EBL Blue */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 48 100% 50%;
+    --sidebar-accent: 48 100% 50%; /* EBL Yellow */
     --sidebar-accent-foreground: 0 0% 0%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 48 100% 50%;
@@ -77,8 +77,8 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    /* EBL Primary - Navy (Dark) */
-    --primary: 210 80% 25%;
+    /* EBL Primary - EBL Blue (Dark) */
+    --primary: 210 100% 40%; /* EBL Blue for dark mode */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 217.2 32.6% 17.5%;
@@ -103,22 +103,22 @@ All colors MUST be HSL.
     --success-foreground: 0 0% 100%;
     --warning: 48 100% 60%;
     --warning-foreground: 0 0% 0%;
-    --info: 210 80% 25%;
+    --info: 210 100% 40%; /* EBL Blue for dark mode */
     --info-foreground: 0 0% 100%;
-    --brand: 210 80% 25%;
+    --brand: 210 100% 40%; /* EBL Blue for dark mode */
     --brand-foreground: 0 0% 100%;
 
-    /* EBL Color Palette - Dark */
-    --ebl-navy: 210 80% 25%;
-    --ebl-navy-light: 210 70% 35%;
-    --ebl-yellow: 48 100% 60%;
+    /* EBL Brand Colors - Dark */
+    --ebl-blue: 210 100% 40%; /* EBL Blue - lighter for dark mode */
+    --ebl-blue-light: 210 80% 50%;
+    --ebl-yellow: 48 100% 60%; /* EBL Yellow - slightly lighter for dark mode */
     --ebl-yellow-light: 48 100% 70%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 210 80% 25%;
+    --sidebar-primary: 210 100% 40%; /* EBL Blue for dark mode */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 48 100% 60%;
+    --sidebar-accent: 48 100% 60%; /* EBL Yellow for dark mode */
     --sidebar-accent-foreground: 0 0% 0%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 48 100% 60%;
