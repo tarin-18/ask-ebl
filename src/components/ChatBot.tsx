@@ -264,7 +264,7 @@ Please respond with 'Yes' or 'No'.`;
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+    <div className="w-full max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
       {/* Chat Header */}
       <div className="bg-gradient-to-r from-primary to-primary/90 text-white p-6 flex items-center gap-4">
         <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center border-2 border-white/20">
@@ -275,7 +275,7 @@ Please respond with 'Yes' or 'No'.`;
           />
         </div>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold">EBL Banking Assistant</h1>
+          <h1 className="text-2xl font-bold">AskEBL - Your Banking Assistant</h1>
           <p className="text-primary-foreground/80">Get instant help with all your banking needs</p>
         </div>
       </div>
@@ -284,7 +284,7 @@ Please respond with 'Yes' or 'No'.`;
       <div className="p-6 bg-gradient-to-r from-accent/10 to-accent/20 border-b">
         <h3 className="text-sm font-semibold text-primary mb-4">Popular Questions:</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {popularQuestions?.slice(0, 8).map((question) => (
+          {popularQuestions?.slice(0, 9).map((question) => (
             <Button
               key={question.id}
               variant="outline"
