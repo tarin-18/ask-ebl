@@ -19,6 +19,8 @@ interface Message {
   originalQuestion?: string; // Store the original question for suggestions
   isCardSelection?: boolean; // For card type selection
   cardOptions?: string[]; // Available card options
+  isAccountSelection?: boolean; // For account type selection
+  accountOptions?: string[]; // Available account options
 }
 
 interface ChatBotProps {
@@ -39,6 +41,7 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const [awaitingSuggestion, setAwaitingSuggestion] = useState<string | null>(null);
   const [awaitingCardSelection, setAwaitingCardSelection] = useState(false);
+  const [awaitingAccountSelection, setAwaitingAccountSelection] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { data: faqs } = useFAQs();
   const { data: popularQuestions } = usePopularQuestions();
@@ -60,6 +63,15 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
     "Islamic Credit Card"
   ];
 
+  const accountTypes = [
+    "Savings Account",
+    "Current Account",
+    "Fixed Deposit Account",
+    "Student Account",
+    "Islamic Savings Account",
+    "Foreign Currency Account"
+  ];
+
   const cardInfo = {
     "Credit Card": "EBL Credit Cards offer worldwide acceptance with attractive rewards, cashback, and exclusive privileges. Features include EMI facilities, balance transfer options, and comprehensive insurance coverage. Annual fees vary by card type with competitive interest rates.",
     "Debit Card": "EBL Debit Cards provide instant access to your account funds with ATM withdrawals, online purchases, and POS transactions. Features include contactless payments, international usage, and real-time SMS alerts for all transactions.",
@@ -68,16 +80,36 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
     "Islamic Credit Card": "EBL Islamic Credit Cards are Shariah-compliant financial products offering ethical banking solutions. Features include profit-sharing instead of interest, halal reward programs, and compliance with Islamic financial principles."
   };
 
+  const accountInfo = {
+    "Savings Account": "EBL Savings Account offers competitive interest rates with flexible deposit and withdrawal options. Features include free ATM transactions, online banking, mobile banking, and SMS alerts. Minimum balance requirements apply with attractive monthly profit rates.",
+    "Current Account": "EBL Current Account is designed for frequent transactions with no transaction limits. Perfect for businesses and individuals with high transaction volumes. Features include checkbook facility, overdraft options, and dedicated relationship manager.",
+    "Fixed Deposit Account": "EBL Fixed Deposit Account offers guaranteed returns with flexible tenure options from 1 month to 5 years. Higher interest rates than savings accounts, with premature encashment facility. Choose from monthly, quarterly, or maturity profit payments.",
+    "Student Account": "EBL Student Account is specially designed for students with zero balance requirements and reduced charges. Features include free debit card, online banking, student loan facilities, and educational discounts at partner merchants.",
+    "Islamic Savings Account": "EBL Islamic Savings Account is Shariah-compliant offering ethical banking solutions. Features include profit-sharing based on Islamic principles, halal investment options, and compliance with Shariah guidelines. No interest-based transactions.",
+    "Foreign Currency Account": "EBL Foreign Currency Account allows you to maintain balances in major foreign currencies including USD, EUR, GBP. Features include competitive exchange rates, international wire transfers, and protection against currency fluctuations."
+  };
+
   const isCardQuery = (userInput: string) => {
     const input = userInput.toLowerCase();
     const cardKeywords = ['card', 'cards', 'credit card', 'debit card', 'corporate card', 'prepaid card', 'islamic card'];
     return cardKeywords.some(keyword => input.includes(keyword));
   };
 
+  const isAccountQuery = (userInput: string) => {
+    const input = userInput.toLowerCase();
+    const accountKeywords = ['account', 'accounts', 'savings account', 'current account', 'fixed deposit', 'student account', 'islamic savings', 'foreign currency'];
+    return accountKeywords.some(keyword => input.includes(keyword));
+  };
+
   const findBestMatch = (userInput: string) => {
     // Check if this is a card-related query
     if (isCardQuery(userInput)) {
       return 'CARD_QUERY';
+    }
+
+    // Check if this is an account-related query
+    if (isAccountQuery(userInput)) {
+      return 'ACCOUNT_QUERY';
     }
 
     // First check FAQs
@@ -191,6 +223,44 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
       return;
     }
 
+    // Check if this is an account selection response
+    if (awaitingAccountSelection) {
+      const selectedAccount = accountTypes.find(account => 
+        account.toLowerCase() === currentInput.toLowerCase() ||
+        currentInput.toLowerCase().includes(account.toLowerCase())
+      );
+
+      if (selectedAccount) {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: accountInfo[selectedAccount as keyof typeof accountInfo],
+          sender: 'bot',
+          timestamp: new Date()
+        };
+
+        setTimeout(() => {
+          setMessages(prev => [...prev, botMessage]);
+          setIsTyping(false);
+          setAwaitingAccountSelection(false);
+        }, 1000);
+      } else {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: "Please select one of the account types I mentioned: Savings Account, Current Account, Fixed Deposit Account, Student Account, Islamic Savings Account, or Foreign Currency Account.",
+          sender: 'bot',
+          timestamp: new Date(),
+          isAccountSelection: true,
+          accountOptions: accountTypes
+        };
+
+        setTimeout(() => {
+          setMessages(prev => [...prev, botMessage]);
+          setIsTyping(false);
+        }, 1000);
+      }
+      return;
+    }
+
     // Check if this is a response to a suggestion prompt
     if (awaitingSuggestion) {
       const response = currentInput.toLowerCase().trim();
@@ -278,10 +348,16 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
       
       let botResponse = '';
       let isCard = false;
+      let isAccount = false;
       if (bestMatch === 'CARD_QUERY') {
         botResponse = "I'd be happy to help you with information about our cards! Please select which type of card you'd like to know about:";
         isCard = true;
         setAwaitingCardSelection(true);
+        setAwaitingSuggestion(null);
+      } else if (bestMatch === 'ACCOUNT_QUERY') {
+        botResponse = "I'd be happy to help you with information about our accounts! Please select which type of account you'd like to know about:";
+        isAccount = true;
+        setAwaitingAccountSelection(true);
         setAwaitingSuggestion(null);
       } else if (bestMatch) {
         botResponse = bestMatch.answer;
@@ -301,10 +377,12 @@ Please respond with 'Yes' or 'No'.`;
         text: botResponse,
         sender: 'bot',
         timestamp: new Date(),
-        isQuestion: !bestMatch && !isCard,
-        originalQuestion: !bestMatch && !isCard ? currentInput : undefined,
+        isQuestion: !bestMatch && !isCard && !isAccount,
+        originalQuestion: !bestMatch && !isCard && !isAccount ? currentInput : undefined,
         isCardSelection: isCard,
-        cardOptions: isCard ? cardTypes : undefined
+        cardOptions: isCard ? cardTypes : undefined,
+        isAccountSelection: isAccount,
+        accountOptions: isAccount ? accountTypes : undefined
       };
 
       setMessages(prev => [...prev, botMessage]);
@@ -325,6 +403,9 @@ Please respond with 'Yes' or 'No'.`;
     }
     if (awaitingCardSelection) {
       setAwaitingCardSelection(false); // Clear any pending card selection
+    }
+    if (awaitingAccountSelection) {
+      setAwaitingAccountSelection(false); // Clear any pending account selection
     }
     setInputText(question);
     // Trigger send after setting the input
@@ -444,6 +525,23 @@ Please respond with 'Yes' or 'No'.`;
                         className="bg-accent hover:bg-accent/90 text-accent-foreground px-4 py-2 text-xs justify-start"
                       >
                         {cardType}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+                {message.isAccountSelection && awaitingAccountSelection && message.accountOptions && (
+                  <div className="mt-3 grid grid-cols-1 gap-2">
+                    {message.accountOptions.map((accountType) => (
+                      <Button 
+                        key={accountType}
+                        size="sm" 
+                        onClick={() => {
+                          setInputText(accountType);
+                          setTimeout(() => handleSendMessage(), 100);
+                        }}
+                        className="bg-accent hover:bg-accent/90 text-accent-foreground px-4 py-2 text-xs justify-start"
+                      >
+                        {accountType}
                       </Button>
                     ))}
                   </div>
