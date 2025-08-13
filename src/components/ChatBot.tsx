@@ -429,7 +429,7 @@ Please respond with 'Yes' or 'No'.`;
       <div className="bg-gradient-to-r from-primary to-primary/90 text-white p-6 flex items-center gap-4">
         <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center border-2 border-white/20">
           <img 
-            src="/src/assets/chat head.jpeg" 
+            src="/lovable-uploads/3130d7ff-26da-43e5-b8dd-c0585dfa7839.png" 
             alt="EBL Chat Assistant" 
             className="w-10 h-10 rounded-full object-cover"
           />
