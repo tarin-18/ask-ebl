@@ -17,6 +17,8 @@ interface Message {
   isTyping?: boolean;
   isQuestion?: boolean; // For suggestion prompts
   originalQuestion?: string; // Store the original question for suggestions
+  isCardSelection?: boolean; // For card type selection
+  cardOptions?: string[]; // Available card options
 }
 
 interface ChatBotProps {
@@ -36,6 +38,7 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const [awaitingSuggestion, setAwaitingSuggestion] = useState<string | null>(null);
+  const [awaitingCardSelection, setAwaitingCardSelection] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { data: faqs } = useFAQs();
   const { data: popularQuestions } = usePopularQuestions();
@@ -49,7 +52,34 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
     scrollToBottom();
   }, [messages]);
 
+  const cardTypes = [
+    "Credit Card",
+    "Debit Card", 
+    "Corporate Card",
+    "Prepaid Card",
+    "Islamic Credit Card"
+  ];
+
+  const cardInfo = {
+    "Credit Card": "EBL Credit Cards offer worldwide acceptance with attractive rewards, cashback, and exclusive privileges. Features include EMI facilities, balance transfer options, and comprehensive insurance coverage. Annual fees vary by card type with competitive interest rates.",
+    "Debit Card": "EBL Debit Cards provide instant access to your account funds with ATM withdrawals, online purchases, and POS transactions. Features include contactless payments, international usage, and real-time SMS alerts for all transactions.",
+    "Corporate Card": "EBL Corporate Cards are designed for business expenses with centralized billing, expense tracking, and detailed monthly statements. Benefits include higher credit limits, business rewards, and comprehensive reporting for accounting purposes.",
+    "Prepaid Card": "EBL Prepaid Cards offer secure payment solutions without requiring a bank account. Load money as needed, control spending, and enjoy the convenience of card payments with enhanced security features.",
+    "Islamic Credit Card": "EBL Islamic Credit Cards are Shariah-compliant financial products offering ethical banking solutions. Features include profit-sharing instead of interest, halal reward programs, and compliance with Islamic financial principles."
+  };
+
+  const isCardQuery = (userInput: string) => {
+    const input = userInput.toLowerCase();
+    const cardKeywords = ['card', 'cards', 'credit card', 'debit card', 'corporate card', 'prepaid card', 'islamic card'];
+    return cardKeywords.some(keyword => input.includes(keyword));
+  };
+
   const findBestMatch = (userInput: string) => {
+    // Check if this is a card-related query
+    if (isCardQuery(userInput)) {
+      return 'CARD_QUERY';
+    }
+
     // First check FAQs
     if (faqs) {
       const faqMatch = findBestMatchInCollection(userInput, faqs);
@@ -122,6 +152,44 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
     const currentInput = inputText;
     setInputText('');
     setIsTyping(true);
+
+    // Check if this is a card selection response
+    if (awaitingCardSelection) {
+      const selectedCard = cardTypes.find(card => 
+        card.toLowerCase() === currentInput.toLowerCase() ||
+        currentInput.toLowerCase().includes(card.toLowerCase())
+      );
+
+      if (selectedCard) {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: cardInfo[selectedCard as keyof typeof cardInfo],
+          sender: 'bot',
+          timestamp: new Date()
+        };
+
+        setTimeout(() => {
+          setMessages(prev => [...prev, botMessage]);
+          setIsTyping(false);
+          setAwaitingCardSelection(false);
+        }, 1000);
+      } else {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: "Please select one of the card types I mentioned: Credit Card, Debit Card, Corporate Card, Prepaid Card, or Islamic Credit Card.",
+          sender: 'bot',
+          timestamp: new Date(),
+          isCardSelection: true,
+          cardOptions: cardTypes
+        };
+
+        setTimeout(() => {
+          setMessages(prev => [...prev, botMessage]);
+          setIsTyping(false);
+        }, 1000);
+      }
+      return;
+    }
 
     // Check if this is a response to a suggestion prompt
     if (awaitingSuggestion) {
@@ -209,7 +277,13 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
       const bestMatch = findBestMatch(currentInput);
       
       let botResponse = '';
-      if (bestMatch) {
+      let isCard = false;
+      if (bestMatch === 'CARD_QUERY') {
+        botResponse = "I'd be happy to help you with information about our cards! Please select which type of card you'd like to know about:";
+        isCard = true;
+        setAwaitingCardSelection(true);
+        setAwaitingSuggestion(null);
+      } else if (bestMatch) {
         botResponse = bestMatch.answer;
         setAwaitingSuggestion(null);
       } else {
@@ -227,8 +301,10 @@ Please respond with 'Yes' or 'No'.`;
         text: botResponse,
         sender: 'bot',
         timestamp: new Date(),
-        isQuestion: !bestMatch,
-        originalQuestion: !bestMatch ? currentInput : undefined
+        isQuestion: !bestMatch && !isCard,
+        originalQuestion: !bestMatch && !isCard ? currentInput : undefined,
+        isCardSelection: isCard,
+        cardOptions: isCard ? cardTypes : undefined
       };
 
       setMessages(prev => [...prev, botMessage]);
@@ -246,6 +322,9 @@ Please respond with 'Yes' or 'No'.`;
   const handleQuickQuestion = (question: string) => {
     if (awaitingSuggestion) {
       setAwaitingSuggestion(null); // Clear any pending suggestion
+    }
+    if (awaitingCardSelection) {
+      setAwaitingCardSelection(false); // Clear any pending card selection
     }
     setInputText(question);
     // Trigger send after setting the input
@@ -350,6 +429,23 @@ Please respond with 'Yes' or 'No'.`;
                     >
                       No
                     </Button>
+                  </div>
+                )}
+                {message.isCardSelection && awaitingCardSelection && message.cardOptions && (
+                  <div className="mt-3 grid grid-cols-1 gap-2">
+                    {message.cardOptions.map((cardType) => (
+                      <Button 
+                        key={cardType}
+                        size="sm" 
+                        onClick={() => {
+                          setInputText(cardType);
+                          setTimeout(() => handleSendMessage(), 100);
+                        }}
+                        className="bg-accent hover:bg-accent/90 text-accent-foreground px-4 py-2 text-xs justify-start"
+                      >
+                        {cardType}
+                      </Button>
+                    ))}
                   </div>
                 )}
                 <div className={`text-xs mt-2 ${
