@@ -21,6 +21,8 @@ interface Message {
   cardOptions?: string[]; // Available card options
   isAccountSelection?: boolean; // For account type selection
   accountOptions?: string[]; // Available account options
+  isLoanSelection?: boolean; // For loan type selection
+  loanOptions?: string[]; // Available loan options
 }
 
 interface ChatBotProps {
@@ -42,6 +44,7 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
   const [awaitingSuggestion, setAwaitingSuggestion] = useState<string | null>(null);
   const [awaitingCardSelection, setAwaitingCardSelection] = useState(false);
   const [awaitingAccountSelection, setAwaitingAccountSelection] = useState(false);
+  const [awaitingLoanSelection, setAwaitingLoanSelection] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { data: faqs } = useFAQs();
   const { data: popularQuestions } = usePopularQuestions();
@@ -72,6 +75,15 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
     "Foreign Currency Account"
   ];
 
+  const loanTypes = [
+    "Personal Loan",
+    "Home Loan",
+    "Car Loan",
+    "Education Loan",
+    "Business Loan",
+    "Islamic Financing"
+  ];
+
   const cardInfo = {
     "Credit Card": "EBL Credit Cards offer worldwide acceptance with attractive rewards, cashback, and exclusive privileges. Features include EMI facilities, balance transfer options, and comprehensive insurance coverage. Annual fees vary by card type with competitive interest rates.",
     "Debit Card": "EBL Debit Cards provide instant access to your account funds with ATM withdrawals, online purchases, and POS transactions. Features include contactless payments, international usage, and real-time SMS alerts for all transactions.",
@@ -89,6 +101,15 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
     "Foreign Currency Account": "EBL Foreign Currency Account allows you to maintain balances in major foreign currencies including USD, EUR, GBP. Features include competitive exchange rates, international wire transfers, and protection against currency fluctuations."
   };
 
+  const loanInfo = {
+    "Personal Loan": "EBL Personal Loan offers quick cash for your personal needs with competitive interest rates and flexible repayment terms up to 5 years. Features include minimal documentation, quick approval within 48 hours, and loan amounts up to BDT 25 lakhs. No collateral required for salaried individuals.",
+    "Home Loan": "EBL Home Loan helps you buy your dream home with attractive interest rates and long-term repayment options up to 20 years. Features include up to 80% financing of property value, step-up EMI options, and free property valuation. Special rates for government employees and women borrowers.",
+    "Car Loan": "EBL Car Loan offers easy financing for new and reconditioned cars with competitive rates and quick processing. Features include up to 85% financing, flexible tenure up to 5 years, and comprehensive insurance coverage. Special partnerships with leading car dealers for better rates.",
+    "Education Loan": "EBL Education Loan supports your educational dreams with affordable financing for higher studies locally and abroad. Features include competitive interest rates, flexible repayment starting after course completion, and coverage for tuition fees, living expenses, and other educational costs.",
+    "Business Loan": "EBL Business Loan provides working capital and term loans for business growth with customized solutions. Features include flexible repayment terms, competitive rates based on business profile, and dedicated relationship manager support. Both secured and unsecured options available.",
+    "Islamic Financing": "EBL Islamic Financing offers Shariah-compliant financing solutions based on Islamic principles. Features include profit-sharing arrangements, asset-backed financing, and compliance with Islamic financial guidelines. Available for personal, business, and property financing needs."
+  };
+
   const isCardQuery = (userInput: string) => {
     const input = userInput.toLowerCase();
     const cardKeywords = ['card', 'cards', 'credit card', 'debit card', 'corporate card', 'prepaid card', 'islamic card'];
@@ -101,6 +122,12 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
     return accountKeywords.some(keyword => input.includes(keyword));
   };
 
+  const isLoanQuery = (userInput: string) => {
+    const input = userInput.toLowerCase();
+    const loanKeywords = ['loan', 'loans', 'personal loan', 'home loan', 'car loan', 'education loan', 'business loan', 'islamic financing', 'financing'];
+    return loanKeywords.some(keyword => input.includes(keyword));
+  };
+
   const findBestMatch = (userInput: string) => {
     // Check if this is a card-related query
     if (isCardQuery(userInput)) {
@@ -110,6 +137,11 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
     // Check if this is an account-related query
     if (isAccountQuery(userInput)) {
       return 'ACCOUNT_QUERY';
+    }
+
+    // Check if this is a loan-related query
+    if (isLoanQuery(userInput)) {
+      return 'LOAN_QUERY';
     }
 
     // First check FAQs
@@ -261,6 +293,44 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
       return;
     }
 
+    // Check if this is a loan selection response
+    if (awaitingLoanSelection) {
+      const selectedLoan = loanTypes.find(loan => 
+        loan.toLowerCase() === currentInput.toLowerCase() ||
+        currentInput.toLowerCase().includes(loan.toLowerCase())
+      );
+
+      if (selectedLoan) {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: loanInfo[selectedLoan as keyof typeof loanInfo],
+          sender: 'bot',
+          timestamp: new Date()
+        };
+
+        setTimeout(() => {
+          setMessages(prev => [...prev, botMessage]);
+          setIsTyping(false);
+          setAwaitingLoanSelection(false);
+        }, 1000);
+      } else {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: "Please select one of the loan types I mentioned: Personal Loan, Home Loan, Car Loan, Education Loan, Business Loan, or Islamic Financing.",
+          sender: 'bot',
+          timestamp: new Date(),
+          isLoanSelection: true,
+          loanOptions: loanTypes
+        };
+
+        setTimeout(() => {
+          setMessages(prev => [...prev, botMessage]);
+          setIsTyping(false);
+        }, 1000);
+      }
+      return;
+    }
+
     // Check if this is a response to a suggestion prompt
     if (awaitingSuggestion) {
       const response = currentInput.toLowerCase().trim();
@@ -349,6 +419,7 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
       let botResponse = '';
       let isCard = false;
       let isAccount = false;
+      let isLoan = false;
       if (bestMatch === 'CARD_QUERY') {
         botResponse = "I'd be happy to help you with information about our cards! Please select which type of card you'd like to know about:";
         isCard = true;
@@ -358,6 +429,11 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
         botResponse = "I'd be happy to help you with information about our accounts! Please select which type of account you'd like to know about:";
         isAccount = true;
         setAwaitingAccountSelection(true);
+        setAwaitingSuggestion(null);
+      } else if (bestMatch === 'LOAN_QUERY') {
+        botResponse = "I'd be happy to help you with information about our loans! Please select which type of loan you'd like to know about:";
+        isLoan = true;
+        setAwaitingLoanSelection(true);
         setAwaitingSuggestion(null);
       } else if (bestMatch) {
         botResponse = bestMatch.answer;
@@ -377,12 +453,14 @@ Please respond with 'Yes' or 'No'.`;
         text: botResponse,
         sender: 'bot',
         timestamp: new Date(),
-        isQuestion: !bestMatch && !isCard && !isAccount,
-        originalQuestion: !bestMatch && !isCard && !isAccount ? currentInput : undefined,
+        isQuestion: !bestMatch && !isCard && !isAccount && !isLoan,
+        originalQuestion: !bestMatch && !isCard && !isAccount && !isLoan ? currentInput : undefined,
         isCardSelection: isCard,
         cardOptions: isCard ? cardTypes : undefined,
         isAccountSelection: isAccount,
-        accountOptions: isAccount ? accountTypes : undefined
+        accountOptions: isAccount ? accountTypes : undefined,
+        isLoanSelection: isLoan,
+        loanOptions: isLoan ? loanTypes : undefined
       };
 
       setMessages(prev => [...prev, botMessage]);
@@ -406,6 +484,9 @@ Please respond with 'Yes' or 'No'.`;
     }
     if (awaitingAccountSelection) {
       setAwaitingAccountSelection(false); // Clear any pending account selection
+    }
+    if (awaitingLoanSelection) {
+      setAwaitingLoanSelection(false); // Clear any pending loan selection
     }
     setInputText(question);
     // Trigger send after setting the input
@@ -542,6 +623,23 @@ Please respond with 'Yes' or 'No'.`;
                         className="bg-accent hover:bg-accent/90 text-accent-foreground px-4 py-2 text-xs justify-start"
                       >
                         {accountType}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+                {message.isLoanSelection && awaitingLoanSelection && message.loanOptions && (
+                  <div className="mt-3 grid grid-cols-1 gap-2">
+                    {message.loanOptions.map((loanType) => (
+                      <Button 
+                        key={loanType}
+                        size="sm" 
+                        onClick={() => {
+                          setInputText(loanType);
+                          setTimeout(() => handleSendMessage(), 100);
+                        }}
+                        className="bg-accent hover:bg-accent/90 text-accent-foreground px-4 py-2 text-xs justify-start"
+                      >
+                        {loanType}
                       </Button>
                     ))}
                   </div>
