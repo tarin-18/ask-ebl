@@ -45,6 +45,8 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
   const [awaitingCardSelection, setAwaitingCardSelection] = useState(false);
   const [awaitingAccountSelection, setAwaitingAccountSelection] = useState(false);
   const [awaitingLoanSelection, setAwaitingLoanSelection] = useState(false);
+  const [awaitingLocationForATM, setAwaitingLocationForATM] = useState(false);
+  const [awaitingLocationForBranch, setAwaitingLocationForBranch] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { data: faqs } = useFAQs();
   const { data: popularQuestions } = usePopularQuestions();
@@ -128,6 +130,18 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
     return loanKeywords.some(keyword => input.includes(keyword));
   };
 
+  const isATMQuery = (userInput: string) => {
+    const input = userInput.toLowerCase();
+    const atmKeywords = ['atm', 'atm booth', 'atm machine', 'cash machine', 'nearby atm', 'atm location'];
+    return atmKeywords.some(keyword => input.includes(keyword));
+  };
+
+  const isBranchQuery = (userInput: string) => {
+    const input = userInput.toLowerCase();
+    const branchKeywords = ['branch', 'branches', 'nearby branch', 'bank branch', 'branch location', 'office'];
+    return branchKeywords.some(keyword => input.includes(keyword));
+  };
+
   const findBestMatch = (userInput: string) => {
     // Check if this is a card-related query
     if (isCardQuery(userInput)) {
@@ -142,6 +156,16 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
     // Check if this is a loan-related query
     if (isLoanQuery(userInput)) {
       return 'LOAN_QUERY';
+    }
+
+    // Check if this is an ATM-related query
+    if (isATMQuery(userInput)) {
+      return 'ATM_QUERY';
+    }
+
+    // Check if this is a branch-related query
+    if (isBranchQuery(userInput)) {
+      return 'BRANCH_QUERY';
     }
 
     // First check FAQs
@@ -331,6 +355,46 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
       return;
     }
 
+    // Check if this is a location response for ATM
+    if (awaitingLocationForATM) {
+      const location = currentInput.trim();
+      const atmBranches = getATMsByLocation(location);
+      
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: atmBranches,
+        sender: 'bot',
+        timestamp: new Date()
+      };
+
+      setTimeout(() => {
+        setMessages(prev => [...prev, botMessage]);
+        setIsTyping(false);
+        setAwaitingLocationForATM(false);
+      }, 1000);
+      return;
+    }
+
+    // Check if this is a location response for Branch
+    if (awaitingLocationForBranch) {
+      const location = currentInput.trim();
+      const branches = getBranchesByLocation(location);
+      
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: branches,
+        sender: 'bot',
+        timestamp: new Date()
+      };
+
+      setTimeout(() => {
+        setMessages(prev => [...prev, botMessage]);
+        setIsTyping(false);
+        setAwaitingLocationForBranch(false);
+      }, 1000);
+      return;
+    }
+
     // Check if this is a response to a suggestion prompt
     if (awaitingSuggestion) {
       const response = currentInput.toLowerCase().trim();
@@ -420,6 +484,8 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
       let isCard = false;
       let isAccount = false;
       let isLoan = false;
+      let isATM = false;
+      let isBranch = false;
       if (bestMatch === 'CARD_QUERY') {
         botResponse = "I'd be happy to help you with information about our cards! Please select which type of card you'd like to know about:";
         isCard = true;
@@ -434,6 +500,16 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
         botResponse = "I'd be happy to help you with information about our loans! Please select which type of loan you'd like to know about:";
         isLoan = true;
         setAwaitingLoanSelection(true);
+        setAwaitingSuggestion(null);
+      } else if (bestMatch === 'ATM_QUERY') {
+        botResponse = "I can help you find nearby EBL ATM booths! Could you please tell me your current location or the area you're looking for?";
+        isATM = true;
+        setAwaitingLocationForATM(true);
+        setAwaitingSuggestion(null);
+      } else if (bestMatch === 'BRANCH_QUERY') {
+        botResponse = "I can help you find nearby EBL branches! Could you please tell me your current location or the area you're looking for?";
+        isBranch = true;
+        setAwaitingLocationForBranch(true);
         setAwaitingSuggestion(null);
       } else if (bestMatch) {
         botResponse = bestMatch.answer;
@@ -463,9 +539,136 @@ Please respond with 'Yes' or 'No'.`;
         loanOptions: isLoan ? loanTypes : undefined
       };
 
-      setMessages(prev => [...prev, botMessage]);
-      setIsTyping(false);
+      if (isCard) {
+        setAwaitingCardSelection(true);
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: (Date.now() + 2).toString(),
+            text: botResponse,
+            sender: 'bot',
+            timestamp: new Date(),
+            isCardSelection: true,
+            cardOptions: cardTypes
+          }]);
+          setIsTyping(false);
+        }, 1000);
+      } else if (isAccount) {
+        setAwaitingAccountSelection(true);
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: (Date.now() + 2).toString(),
+            text: botResponse,
+            sender: 'bot',
+            timestamp: new Date(),
+            isAccountSelection: true,
+            accountOptions: accountTypes
+          }]);
+          setIsTyping(false);
+        }, 1000);
+      } else if (isLoan) {
+        setAwaitingLoanSelection(true);
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: (Date.now() + 2).toString(),
+            text: botResponse,
+            sender: 'bot',
+            timestamp: new Date(),
+            isLoanSelection: true,
+            loanOptions: loanTypes
+          }]);
+          setIsTyping(false);
+        }, 1000);
+      } else if (isATM) {
+        setAwaitingLocationForATM(true);
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: (Date.now() + 2).toString(),
+            text: botResponse,
+            sender: 'bot',
+            timestamp: new Date()
+          }]);
+          setIsTyping(false);
+        }, 1000);
+      } else if (isBranch) {
+        setAwaitingLocationForBranch(true);
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: (Date.now() + 2).toString(),
+            text: botResponse,
+            sender: 'bot',
+            timestamp: new Date()
+          }]);
+          setIsTyping(false);
+        }, 1000);
+      } else {
+        setMessages(prev => [...prev, botMessage]);
+        setIsTyping(false);
+      }
     }, 1000 + Math.random() * 1000);
+  };
+
+  const getATMsByLocation = (location: string) => {
+    const locationLower = location.toLowerCase();
+    
+    // Sample ATM data - in real app, this would come from a database
+    const atmData: Record<string, string[]> = {
+      'dhaka': [
+        'Gulshan Avenue Branch ATM - 100 Gulshan Avenue, Dhaka-1212',
+        'Dhanmondi Branch ATM - 32 Dhanmondi, Dhaka-1205',
+        'Motijheel Branch ATM - 56 Motijheel, Dhaka-1000',
+        'Uttara Branch ATM - House 45, Road 12, Sector 7, Uttara, Dhaka-1230'
+      ],
+      'chittagong': [
+        'Agrabad Branch ATM - 1420 Sheikh Mujib Road, Agrabad, Chittagong',
+        'Nasirabad Branch ATM - 786 CDA Avenue, Nasirabad, Chittagong',
+        'Station Road Branch ATM - 123 Station Road, Chittagong'
+      ],
+      'sylhet': [
+        'Zindabazar Branch ATM - 45 Zindabazar, Sylhet',
+        'Amberkhana Branch ATM - 789 Amberkhana, Sylhet'
+      ]
+    };
+
+    // Check for specific areas
+    for (const [area, atms] of Object.entries(atmData)) {
+      if (locationLower.includes(area)) {
+        return `Here are the nearby EBL ATM booths in ${area.charAt(0).toUpperCase() + area.slice(1)}:\n\n${atms.map((atm, index) => `${index + 1}. ${atm}`).join('\n\n')}\n\nAll ATMs are available 24/7 with cash withdrawal, balance inquiry, and mini statement services.`;
+      }
+    }
+
+    return `I found some EBL ATM booths near your location:\n\n1. EBL ATM - ${location} Branch, Main Road\n2. EBL ATM - ${location} Commercial Area\n3. EBL ATM - ${location} Shopping Complex\n\nFor exact addresses and directions, please call our customer service at 16227 or visit our website. All ATMs are available 24/7.`;
+  };
+
+  const getBranchesByLocation = (location: string) => {
+    const locationLower = location.toLowerCase();
+    
+    // Sample branch data - in real app, this would come from a database
+    const branchData: Record<string, string[]> = {
+      'dhaka': [
+        'Gulshan Branch - 100 Gulshan Avenue, Dhaka-1212 | Phone: +880-2-8830721',
+        'Dhanmondi Branch - 32 Dhanmondi, Dhaka-1205 | Phone: +880-2-9661301',
+        'Motijheel Branch - 56 Motijheel, Dhaka-1000 | Phone: +880-2-9560387',
+        'Uttara Branch - House 45, Road 12, Sector 7, Uttara, Dhaka-1230 | Phone: +880-2-8958742'
+      ],
+      'chittagong': [
+        'Agrabad Branch - 1420 Sheikh Mujib Road, Agrabad, Chittagong | Phone: +880-31-710501',
+        'Nasirabad Branch - 786 CDA Avenue, Nasirabad, Chittagong | Phone: +880-31-624578',
+        'Station Road Branch - 123 Station Road, Chittagong | Phone: +880-31-635241'
+      ],
+      'sylhet': [
+        'Zindabazar Branch - 45 Zindabazar, Sylhet | Phone: +880-821-725687',
+        'Amberkhana Branch - 789 Amberkhana, Sylhet | Phone: +880-821-714523'
+      ]
+    };
+
+    // Check for specific areas
+    for (const [area, branches] of Object.entries(branchData)) {
+      if (locationLower.includes(area)) {
+        return `Here are the nearby EBL branches in ${area.charAt(0).toUpperCase() + area.slice(1)}:\n\n${branches.map((branch, index) => `${index + 1}. ${branch}`).join('\n\n')}\n\nBranch Hours: Sunday to Thursday 9:00 AM - 5:00 PM\nFriday: 9:00 AM - 12:00 PM\nSaturday: Closed`;
+      }
+    }
+
+    return `Here are EBL branches near your location:\n\n1. EBL ${location} Branch - Main Road, ${location} | Phone: 16227\n2. EBL ${location} Commercial Branch - Commercial Area, ${location} | Phone: 16227\n\nBranch Hours: Sunday to Thursday 9:00 AM - 5:00 PM\nFriday: 9:00 AM - 12:00 PM\nSaturday: Closed\n\nFor exact addresses and directions, please call 16227.`;
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
