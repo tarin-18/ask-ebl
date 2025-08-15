@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2 } from "lucide-react";
+import { Send, Bot, User, Loader2, Trash2, Info, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useFAQs } from "@/hooks/useBankingData";
 import { usePopularQuestions } from "@/hooks/usePopularQuestions";
 import { useToast } from "@/hooks/use-toast";
@@ -23,6 +24,7 @@ interface Message {
   accountOptions?: string[]; // Available account options
   isLoanSelection?: boolean; // For loan type selection
   loanOptions?: string[]; // Available loan options
+  showFeedback?: boolean; // For showing feedback emojis
 }
 
 interface ChatBotProps {
@@ -253,7 +255,8 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
           id: (Date.now() + 1).toString(),
           text: cardInfo[selectedCard as keyof typeof cardInfo],
           sender: 'bot',
-          timestamp: new Date()
+          timestamp: new Date(),
+          showFeedback: true
         };
 
         setTimeout(() => {
@@ -291,7 +294,8 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
           id: (Date.now() + 1).toString(),
           text: accountInfo[selectedAccount as keyof typeof accountInfo],
           sender: 'bot',
-          timestamp: new Date()
+          timestamp: new Date(),
+          showFeedback: true
         };
 
         setTimeout(() => {
@@ -329,7 +333,8 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
           id: (Date.now() + 1).toString(),
           text: loanInfo[selectedLoan as keyof typeof loanInfo],
           sender: 'bot',
-          timestamp: new Date()
+          timestamp: new Date(),
+          showFeedback: true
         };
 
         setTimeout(() => {
@@ -364,7 +369,8 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
         id: (Date.now() + 1).toString(),
         text: atmBranches,
         sender: 'bot',
-        timestamp: new Date()
+        timestamp: new Date(),
+        showFeedback: true
       };
 
       setTimeout(() => {
@@ -384,7 +390,8 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
         id: (Date.now() + 1).toString(),
         text: branches,
         sender: 'bot',
-        timestamp: new Date()
+        timestamp: new Date(),
+        showFeedback: true
       };
 
       setTimeout(() => {
@@ -424,7 +431,7 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
           }, 1000);
 
           toast({
-            title: "Question Submitted",
+            title: "Suggestion Submitted",
             description: "Your suggestion has been sent to our admin team for review.",
           });
 
@@ -478,6 +485,25 @@ export function ChatBot({ initialMessage }: ChatBotProps) {
 
     // Normal FAQ processing
     setTimeout(() => {
+      const input = currentInput.toLowerCase();
+      
+      // Check for lost card query
+      if (input.includes('lost card') || input.includes('card lost') || input.includes('report card') || input.includes('card stolen')) {
+        const lostCardBotMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: "Here's what you need to do immediately if you've lost your card:\n\n🚨 **Immediate Actions:**\n1. **Block your card immediately** by calling EBL 24/7 hotline: 16421 or +88-02-8836010\n2. **Visit the nearest EBL branch** with your NID and account details\n3. **File a written application** for card replacement\n\n📋 **Required Documents:**\n• Original National ID Card\n• Account opening form copy\n• 2 recent passport-size photographs\n• Police report (if card was stolen)\n\n💳 **Card Replacement Process:**\n• New card will be issued within 7-10 working days\n• Replacement fee: BDT 500 for debit card, BDT 1000 for credit card\n• You can request emergency cash if needed\n\n⚠️ **Important:** Monitor your account for unauthorized transactions and report them immediately. EBL provides zero liability protection for fraudulent transactions reported within 24 hours.",
+          sender: 'bot',
+          timestamp: new Date(),
+          showFeedback: true
+        };
+
+        setTimeout(() => {
+          setMessages(prev => [...prev, lostCardBotMessage]);
+          setIsTyping(false);
+        }, 1000);
+        return;
+      }
+      
       const bestMatch = findBestMatch(currentInput);
       
       let botResponse = '';
@@ -536,7 +562,8 @@ Please respond with 'Yes' or 'No'.`;
         isAccountSelection: isAccount,
         accountOptions: isAccount ? accountTypes : undefined,
         isLoanSelection: isLoan,
-        loanOptions: isLoan ? loanTypes : undefined
+        loanOptions: isLoan ? loanTypes : undefined,
+        showFeedback: bestMatch && !isCard && !isAccount && !isLoan && !isATM && !isBranch
       };
 
       if (isCard) {
@@ -578,72 +605,53 @@ Please respond with 'Yes' or 'No'.`;
           }]);
           setIsTyping(false);
         }, 1000);
-      } else if (isATM) {
-        setAwaitingLocationForATM(true);
-        setTimeout(() => {
-          setMessages(prev => [...prev, {
-            id: (Date.now() + 2).toString(),
-            text: botResponse,
-            sender: 'bot',
-            timestamp: new Date()
-          }]);
-          setIsTyping(false);
-        }, 1000);
-      } else if (isBranch) {
-        setAwaitingLocationForBranch(true);
-        setTimeout(() => {
-          setMessages(prev => [...prev, {
-            id: (Date.now() + 2).toString(),
-            text: botResponse,
-            sender: 'bot',
-            timestamp: new Date()
-          }]);
-          setIsTyping(false);
-        }, 1000);
       } else {
-        setMessages(prev => [...prev, botMessage]);
-        setIsTyping(false);
+        setTimeout(() => {
+          setMessages(prev => [...prev, botMessage]);
+          setIsTyping(false);
+        }, 1000);
       }
-    }, 1000 + Math.random() * 1000);
+    }, 1000);
   };
 
   const getATMsByLocation = (location: string) => {
     const locationLower = location.toLowerCase();
-    
-    // Sample ATM data - in real app, this would come from a database
-    const atmData: Record<string, string[]> = {
+
+    // Pre-defined ATM data for major areas
+    const atmData: { [key: string]: string[] } = {
       'dhaka': [
-        'Gulshan Avenue Branch ATM - 100 Gulshan Avenue, Dhaka-1212',
-        'Dhanmondi Branch ATM - 32 Dhanmondi, Dhaka-1205',
-        'Motijheel Branch ATM - 56 Motijheel, Dhaka-1000',
-        'Uttara Branch ATM - House 45, Road 12, Sector 7, Uttara, Dhaka-1230'
+        'EBL ATM - Gulshan 1 Circle, Dhaka-1212 | 24/7 Service',
+        'EBL ATM - Dhanmondi 27, Dhaka-1205 | 24/7 Service',
+        'EBL ATM - Motijheel Commercial Area, Dhaka-1000 | 24/7 Service',
+        'EBL ATM - Uttara Sector 7, Dhaka-1230 | 24/7 Service',
+        'EBL ATM - Wari, Dhaka-1203 | 24/7 Service'
       ],
       'chittagong': [
-        'Agrabad Branch ATM - 1420 Sheikh Mujib Road, Agrabad, Chittagong',
-        'Nasirabad Branch ATM - 786 CDA Avenue, Nasirabad, Chittagong',
-        'Station Road Branch ATM - 123 Station Road, Chittagong'
+        'EBL ATM - Agrabad Commercial Area, Chittagong | 24/7 Service',
+        'EBL ATM - Nasirabad, Chittagong | 24/7 Service',
+        'EBL ATM - Station Road, Chittagong | 24/7 Service'
       ],
       'sylhet': [
-        'Zindabazar Branch ATM - 45 Zindabazar, Sylhet',
-        'Amberkhana Branch ATM - 789 Amberkhana, Sylhet'
+        'EBL ATM - Zindabazar, Sylhet | 24/7 Service',
+        'EBL ATM - Amberkhana, Sylhet | 24/7 Service'
       ]
     };
 
     // Check for specific areas
     for (const [area, atms] of Object.entries(atmData)) {
       if (locationLower.includes(area)) {
-        return `Here are the nearby EBL ATM booths in ${area.charAt(0).toUpperCase() + area.slice(1)}:\n\n${atms.map((atm, index) => `${index + 1}. ${atm}`).join('\n\n')}\n\nAll ATMs are available 24/7 with cash withdrawal, balance inquiry, and mini statement services.`;
+        return `Here are the nearby EBL ATM booths in ${area.charAt(0).toUpperCase() + area.slice(1)}:\n\n${atms.map((atm, index) => `${index + 1}. ${atm}`).join('\n\n')}\n\nAll ATMs provide 24/7 cash withdrawal, balance inquiry, and mini statements. Daily withdrawal limit: BDT 40,000.`;
       }
     }
 
-    return `I found some EBL ATM booths near your location:\n\n1. EBL ATM - ${location} Branch, Main Road\n2. EBL ATM - ${location} Commercial Area\n3. EBL ATM - ${location} Shopping Complex\n\nFor exact addresses and directions, please call our customer service at 16227 or visit our website. All ATMs are available 24/7.`;
+    return `Here are EBL ATM booths near your location:\n\n1. EBL ATM - ${location} Main Branch | 24/7 Service\n2. EBL ATM - ${location} Commercial Area | 24/7 Service\n3. EBL ATM - ${location} Shopping Center | 24/7 Service\n\nAll ATMs provide 24/7 cash withdrawal, balance inquiry, and mini statements. For exact locations, please call 16227.`;
   };
 
   const getBranchesByLocation = (location: string) => {
     const locationLower = location.toLowerCase();
-    
-    // Sample branch data - in real app, this would come from a database
-    const branchData: Record<string, string[]> = {
+
+    // Pre-defined branch data for major areas
+    const branchData: { [key: string]: string[] } = {
       'dhaka': [
         'Gulshan Branch - 100 Gulshan Avenue, Dhaka-1212 | Phone: +880-2-8830721',
         'Dhanmondi Branch - 32 Dhanmondi, Dhaka-1205 | Phone: +880-2-9661301',
@@ -707,6 +715,30 @@ Please respond with 'Yes' or 'No'.`;
     ));
   };
 
+  const clearChat = () => {
+    setMessages([
+      {
+        id: '1',
+        text: 'Hello! I\'m AskEBL, your banking assistant. How can I help you today?',
+        sender: 'bot',
+        timestamp: new Date()
+      }
+    ]);
+    setAwaitingSuggestion(null);
+    setAwaitingCardSelection(false);
+    setAwaitingAccountSelection(false);
+    setAwaitingLoanSelection(false);
+    setAwaitingLocationForATM(false);
+    setAwaitingLocationForBranch(false);
+  };
+
+  const handleFeedback = (messageId: string, isPositive: boolean) => {
+    toast({
+      title: "Thank you for your feedback!",
+      description: isPositive ? "Glad I could help!" : "We'll work on improving our responses.",
+    });
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
       {/* Chat Header */}
@@ -721,6 +753,40 @@ Please respond with 'Yes' or 'No'.`;
         <div className="flex-1">
           <h1 className="text-2xl font-bold">AskEBL - Your Banking Assistant</h1>
           <p className="text-primary-foreground/80">Get instant help with all your banking needs</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
+                <Info className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>EBL Contact Information</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold mb-2">Contact Us</h4>
+                  <p>📞 Hotline: 16421</p>
+                  <p>📞 International: +88-02-8836010</p>
+                  <p>📧 Email: info@ebl.com.bd</p>
+                  <p>🌐 Website: www.ebl.com.bd</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-2">Customer Support Hours</h4>
+                  <p>🕒 24/7 Emergency Support</p>
+                  <p>🕘 Branch Hours: 9:00 AM - 5:00 PM (Sunday-Thursday)</p>
+                  <p>🕘 Call Center: 9:00 AM - 9:00 PM (Sunday-Thursday)</p>
+                  <p>📅 Friday: 9:00 AM - 12:00 PM & 2:00 PM - 5:00 PM</p>
+                  <p>📅 Saturday: Closed</p>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <Button variant="ghost" size="sm" onClick={clearChat} className="text-white hover:bg-white/10">
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
@@ -847,13 +913,36 @@ Please respond with 'Yes' or 'No'.`;
                     ))}
                   </div>
                 )}
-                <div className={`text-xs mt-2 ${
+                <div className={`flex items-center justify-between text-xs mt-2 ${
                   message.sender === 'user' ? 'text-primary-foreground/70' : 'text-gray-500'
                 }`}>
-                  {message.timestamp.toLocaleTimeString('en-BD', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
+                  <span>
+                    {message.timestamp.toLocaleTimeString('en-BD', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </span>
+                  {message.sender === 'bot' && message.showFeedback && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">Was this helpful?</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-green-100"
+                        onClick={() => handleFeedback(message.id, true)}
+                      >
+                        <ThumbsUp className="h-3 w-3 text-green-600" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-red-100"
+                        onClick={() => handleFeedback(message.id, false)}
+                      >
+                        <ThumbsDown className="h-3 w-3 text-red-600" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
