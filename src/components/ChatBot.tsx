@@ -672,11 +672,11 @@ Please respond with 'Yes' or 'No'.`;
     // Check for specific areas
     for (const [area, branches] of Object.entries(branchData)) {
       if (locationLower.includes(area)) {
-        return `Here are the nearby EBL branches in ${area.charAt(0).toUpperCase() + area.slice(1)}:\n\n${branches.map((branch, index) => `${index + 1}. ${branch}`).join('\n\n')}\n\nBranch Hours: Sunday to Thursday 9:00 AM - 5:00 PM\nFriday: 9:00 AM - 12:00 PM\nSaturday: Closed`;
+        return `Here are the nearby EBL branches in ${area.charAt(0).toUpperCase() + area.slice(1)}:\n\n${branches.map((branch, index) => `${index + 1}. ${branch}`).join('\n\n')}\n\nBranch Hours: Sunday to Thursday 10:00 AM - 6:00 PM\nFriday & Saturday: Closed`;
       }
     }
 
-    return `Here are EBL branches near your location:\n\n1. EBL ${location} Branch - Main Road, ${location} | Phone: 16227\n2. EBL ${location} Commercial Branch - Commercial Area, ${location} | Phone: 16227\n\nBranch Hours: Sunday to Thursday 9:00 AM - 5:00 PM\nFriday: 9:00 AM - 12:00 PM\nSaturday: Closed\n\nFor exact addresses and directions, please call 16227.`;
+    return `Here are EBL branches near your location:\n\n1. EBL ${location} Branch - Main Road, ${location} | Phone: 16227\n2. EBL ${location} Commercial Branch - Commercial Area, ${location} | Phone: 16227\n\nBranch Hours: Sunday to Thursday 10:00 AM - 6:00 PM\nFriday & Saturday: Closed\n\nFor exact addresses and directions, please call 16227.`;
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -776,10 +776,8 @@ Please respond with 'Yes' or 'No'.`;
                 <div>
                   <h4 className="font-semibold mb-2">Customer Support Hours</h4>
                   <p>🕒 24/7 Emergency Support</p>
-                  <p>🕘 Branch Hours: 9:00 AM - 5:00 PM (Sunday-Thursday)</p>
-                  <p>🕘 Call Center: 9:00 AM - 9:00 PM (Sunday-Thursday)</p>
-                  <p>📅 Friday: 9:00 AM - 12:00 PM & 2:00 PM - 5:00 PM</p>
-                  <p>📅 Saturday: Closed</p>
+                  <p>🕘 Branch Hours: 10:00 AM - 6:00 PM (Sunday-Thursday)</p>
+                  <p>📅 Friday & Saturday: Closed</p>
                 </div>
               </div>
             </DialogContent>
