@@ -12,19 +12,19 @@ const Index = () => {
         <p className="text-lg text-gray-600">Ask anything about banking services</p>
       </div>
       
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-start justify-center">
         {/* EMI Calculator - Left Side */}
-        <div className="order-2 lg:order-1">
+        <div className="w-full lg:w-80 lg:order-1 order-2">
           <EMICalculator />
         </div>
         
         {/* ChatBot - Center */}
-        <div className="order-1 lg:order-2">
+        <div className="w-full max-w-2xl lg:order-2 order-1 mx-auto">
           <ChatBot initialMessage="Hello! I'm AskEBL, your EBL Banking Assistant. How can I help you today?" />
         </div>
         
         {/* Currency Converter - Right Side */}
-        <div className="order-3 lg:order-3">
+        <div className="w-full lg:w-80 lg:order-3 order-3">
           <CurrencyConverter />
         </div>
       </div>

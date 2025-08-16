@@ -50,16 +50,16 @@ const CurrencyConverter = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-ebl-blue">
-          <DollarSign className="h-5 w-5" />
+    <Card className="w-full max-w-sm mx-auto bg-amber-50 border-amber-200">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-amber-800 text-lg">
+          <DollarSign className="h-4 w-4" />
           Currency Converter
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="amount">Amount</Label>
+      <CardContent className="space-y-3">
+        <div className="space-y-1">
+          <Label htmlFor="amount" className="text-xs text-amber-700">Amount</Label>
           <Input
             id="amount"
             type="number"
@@ -67,18 +67,19 @@ const CurrencyConverter = () => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="Enter amount"
+            className="h-8 text-xs"
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="fromCurrency">From Currency</Label>
+        <div className="space-y-1">
+          <Label htmlFor="fromCurrency" className="text-xs text-amber-700">From Currency</Label>
           <Select value={fromCurrency} onValueChange={setFromCurrency}>
-            <SelectTrigger>
+            <SelectTrigger className="h-8 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {Object.entries(exchangeRates).map(([code, { name, flag }]) => (
-                <SelectItem key={code} value={code}>
+                <SelectItem key={code} value={code} className="text-xs">
                   {flag} {code} - {name}
                 </SelectItem>
               ))}
@@ -86,53 +87,39 @@ const CurrencyConverter = () => {
           </Select>
         </div>
 
-        <div className="flex items-center justify-center">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={swapCurrency}
-            className="p-2"
-          >
-            <ArrowUpDown className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="space-y-2">
-          <Label>To Currency</Label>
-          <div className="p-3 bg-muted rounded-md">
+        <div className="space-y-1">
+          <Label className="text-xs text-amber-700">To Currency</Label>
+          <div className="p-2 bg-amber-100 rounded-md text-xs text-amber-800">
             🇧🇩 BDT - Bangladeshi Taka
           </div>
         </div>
 
-        <Button onClick={convertCurrency} className="w-full bg-ebl-blue hover:bg-ebl-blue/90">
+        <Button onClick={convertCurrency} className="w-full h-8 bg-amber-700 hover:bg-amber-800 text-xs">
           Convert to BDT
         </Button>
 
         {convertedAmount > 0 && (
-          <div className="mt-6 p-4 bg-gradient-to-r from-ebl-blue/5 to-ebl-yellow/5 rounded-lg border">
-            <h3 className="font-semibold text-ebl-blue mb-3">Conversion Result</h3>
-            <div className="space-y-2">
+          <div className="mt-3 p-3 bg-yellow-100 rounded-lg border border-yellow-200">
+            <h3 className="font-semibold text-amber-800 mb-2 text-xs">Result</h3>
+            <div className="space-y-1">
               <div className="text-center">
-                <div className="text-lg font-semibold">
+                <div className="text-xs font-semibold text-amber-800">
                   {exchangeRates[fromCurrency].flag} {amount} {fromCurrency}
                 </div>
-                <div className="text-sm text-muted-foreground my-1">=</div>
-                <div className="text-2xl font-bold text-ebl-blue">
+                <div className="text-xs text-amber-600 my-1">=</div>
+                <div className="text-sm font-bold text-amber-800">
                   🇧🇩 ৳{convertedAmount.toLocaleString()}
                 </div>
               </div>
-              <div className="text-center text-xs text-muted-foreground mt-3">
+              <div className="text-center text-xs text-amber-600 mt-2">
                 Rate: 1 {fromCurrency} = ৳{exchangeRates[fromCurrency].rate}
-              </div>
-              <div className="text-center text-xs text-muted-foreground">
-                Last updated: {lastUpdated}
               </div>
             </div>
           </div>
         )}
 
-        <div className="text-xs text-muted-foreground text-center">
-          <p>* Exchange rates are indicative and may vary from actual market rates.</p>
+        <div className="text-xs text-amber-600 text-center">
+          <p>* Indicative rates only</p>
         </div>
       </CardContent>
     </Card>
