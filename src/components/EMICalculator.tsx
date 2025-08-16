@@ -54,16 +54,16 @@ const EMICalculator = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-ebl-blue">
-          <Calculator className="h-5 w-5" />
+    <Card className="w-full max-w-sm mx-auto bg-primary/95 border-primary/80">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-primary-foreground text-lg">
+          <Calculator className="h-4 w-4" />
           EMI Calculator
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="loanType">Loan Type</Label>
+      <CardContent className="space-y-3 text-primary-foreground">
+        <div className="space-y-1">
+          <Label htmlFor="loanType" className="text-xs text-primary-foreground">Loan Type</Label>
           <Select value={loanType} onValueChange={handleLoanTypeChange}>
             <SelectTrigger>
               <SelectValue placeholder="Select loan type" />
@@ -78,19 +78,20 @@ const EMICalculator = () => {
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="principal">Loan Amount (BDT)</Label>
+        <div className="space-y-1">
+          <Label htmlFor="principal" className="text-xs text-primary-foreground">Loan Amount (BDT)</Label>
           <Input
             id="principal"
             type="number"
             value={principal}
             onChange={(e) => setPrincipal(e.target.value)}
             placeholder="Enter loan amount"
+            className="h-8 text-xs bg-background/90"
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="interestRate">Interest Rate (% per annum)</Label>
+        <div className="space-y-1">
+          <Label htmlFor="interestRate" className="text-xs text-primary-foreground">Interest Rate (% per annum)</Label>
           <Input
             id="interestRate"
             type="number"
@@ -98,38 +99,40 @@ const EMICalculator = () => {
             value={interestRate}
             onChange={(e) => setInterestRate(e.target.value)}
             placeholder="Enter interest rate"
+            className="h-8 text-xs bg-background/90"
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="tenure">Loan Tenure (Years)</Label>
+        <div className="space-y-1">
+          <Label htmlFor="tenure" className="text-xs text-primary-foreground">Loan Tenure (Years)</Label>
           <Input
             id="tenure"
             type="number"
             value={tenure}
             onChange={(e) => setTenure(e.target.value)}
             placeholder="Enter tenure in years"
+            className="h-8 text-xs bg-background/90"
           />
         </div>
 
-        <Button onClick={calculateEMI} className="w-full bg-ebl-blue hover:bg-ebl-blue/90">
+        <Button onClick={calculateEMI} className="w-full h-8 text-xs bg-background hover:bg-background/90 text-primary">
           Calculate EMI
         </Button>
 
         {emi > 0 && (
-          <div className="mt-6 p-4 bg-gradient-to-r from-ebl-blue/5 to-ebl-yellow/5 rounded-lg border">
-            <h3 className="font-semibold text-ebl-blue mb-3">EMI Calculation Results</h3>
-            <div className="space-y-2 text-sm">
+          <div className="mt-4 p-3 bg-gradient-to-r from-accent/10 to-accent/20 rounded-lg border border-accent/30">
+            <h3 className="font-semibold text-primary text-xs mb-2">EMI Calculation Results</h3>
+            <div className="space-y-1 text-xs">
               <div className="flex justify-between">
-                <span>Monthly EMI:</span>
-                <span className="font-semibold text-ebl-blue">৳{emi.toLocaleString()}</span>
+                <span className="text-foreground/80">Monthly EMI:</span>
+                <span className="font-semibold text-primary">৳{emi.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span>Total Amount:</span>
+                <span className="text-foreground/80">Total Amount:</span>
                 <span className="font-semibold">৳{totalAmount.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span>Total Interest:</span>
+                <span className="text-foreground/80">Total Interest:</span>
                 <span className="font-semibold">৳{totalInterest.toLocaleString()}</span>
               </div>
             </div>
