@@ -50,16 +50,16 @@ const CurrencyConverter = () => {
   };
 
   return (
-    <Card className="w-full max-w-sm mx-auto bg-amber-50 border-amber-200">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-amber-800 text-lg">
-          <DollarSign className="h-4 w-4" />
+    <Card className="w-full max-w-xs mx-auto bg-slate-50 border-slate-200">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-1 text-blue-800 text-sm">
+          <DollarSign className="h-3 w-3" />
           Currency Converter
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2">
         <div className="space-y-1">
-          <Label htmlFor="amount" className="text-xs text-amber-700">Amount</Label>
+          <Label htmlFor="amount" className="text-xs text-blue-700">Amount</Label>
           <Input
             id="amount"
             type="number"
@@ -67,14 +67,14 @@ const CurrencyConverter = () => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="Enter amount"
-            className="h-8 text-xs"
+            className="h-7 text-xs"
           />
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="fromCurrency" className="text-xs text-amber-700">From Currency</Label>
+          <Label htmlFor="fromCurrency" className="text-xs text-blue-700">From Currency</Label>
           <Select value={fromCurrency} onValueChange={setFromCurrency}>
-            <SelectTrigger className="h-8 text-xs">
+            <SelectTrigger className="h-7 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -88,37 +88,37 @@ const CurrencyConverter = () => {
         </div>
 
         <div className="space-y-1">
-          <Label className="text-xs text-amber-700">To Currency</Label>
-          <div className="p-2 bg-amber-100 rounded-md text-xs text-amber-800">
+          <Label className="text-xs text-blue-700">To Currency</Label>
+          <div className="p-1.5 bg-blue-100 rounded-md text-xs text-blue-800">
             🇧🇩 BDT - Bangladeshi Taka
           </div>
         </div>
 
-        <Button onClick={convertCurrency} className="w-full h-8 bg-amber-700 hover:bg-amber-800 text-xs">
+        <Button onClick={convertCurrency} className="w-full h-7 bg-blue-700 hover:bg-blue-800 text-xs">
           Convert to BDT
         </Button>
 
         {convertedAmount > 0 && (
-          <div className="mt-3 p-3 bg-yellow-100 rounded-lg border border-yellow-200">
-            <h3 className="font-semibold text-amber-800 mb-2 text-xs">Result</h3>
-            <div className="space-y-1">
+          <div className="mt-2 p-2 bg-yellow-100 rounded-lg border border-yellow-200">
+            <h3 className="font-semibold text-blue-800 mb-1 text-xs">Result</h3>
+            <div className="space-y-0.5">
               <div className="text-center">
-                <div className="text-xs font-semibold text-amber-800">
+                <div className="text-xs font-semibold text-blue-800">
                   {exchangeRates[fromCurrency].flag} {amount} {fromCurrency}
                 </div>
-                <div className="text-xs text-amber-600 my-1">=</div>
-                <div className="text-sm font-bold text-amber-800">
+                <div className="text-xs text-blue-600 my-0.5">=</div>
+                <div className="text-sm font-bold text-blue-800">
                   🇧🇩 ৳{convertedAmount.toLocaleString()}
                 </div>
               </div>
-              <div className="text-center text-xs text-amber-600 mt-2">
+              <div className="text-center text-xs text-blue-600 mt-1">
                 Rate: 1 {fromCurrency} = ৳{exchangeRates[fromCurrency].rate}
               </div>
             </div>
           </div>
         )}
 
-        <div className="text-xs text-amber-600 text-center">
+        <div className="text-xs text-blue-600 text-center">
           <p>* Indicative rates only</p>
         </div>
       </CardContent>

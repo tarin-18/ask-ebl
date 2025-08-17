@@ -54,16 +54,16 @@ const EMICalculator = () => {
   };
 
   return (
-    <Card className="w-full max-w-sm mx-auto bg-amber-50 border-amber-200">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-amber-800 text-lg">
-          <Calculator className="h-4 w-4" />
+    <Card className="w-full max-w-xs mx-auto bg-slate-50 border-slate-200">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-1 text-blue-800 text-sm">
+          <Calculator className="h-3 w-3" />
           EMI Calculator
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2">
         <div className="space-y-1">
-          <Label htmlFor="loanType" className="text-xs text-amber-700">Loan Type</Label>
+          <Label htmlFor="loanType" className="text-xs text-blue-700">Loan Type</Label>
           <Select value={loanType} onValueChange={handleLoanTypeChange}>
             <SelectTrigger className="h-8 text-xs">
               <SelectValue placeholder="Select loan type" />
@@ -79,19 +79,19 @@ const EMICalculator = () => {
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="principal" className="text-xs text-amber-700">Loan Amount (BDT)</Label>
+          <Label htmlFor="principal" className="text-xs text-blue-700">Loan Amount (BDT)</Label>
           <Input
             id="principal"
             type="number"
             value={principal}
             onChange={(e) => setPrincipal(e.target.value)}
             placeholder="Enter amount"
-            className="h-8 text-xs"
+            className="h-7 text-xs"
           />
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="interestRate" className="text-xs text-amber-700">Interest Rate (%)</Label>
+          <Label htmlFor="interestRate" className="text-xs text-blue-700">Interest Rate (%)</Label>
           <Input
             id="interestRate"
             type="number"
@@ -99,41 +99,41 @@ const EMICalculator = () => {
             value={interestRate}
             onChange={(e) => setInterestRate(e.target.value)}
             placeholder="Enter rate"
-            className="h-8 text-xs"
+            className="h-7 text-xs"
           />
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="tenure" className="text-xs text-amber-700">Tenure (Years)</Label>
+          <Label htmlFor="tenure" className="text-xs text-blue-700">Tenure (Years)</Label>
           <Input
             id="tenure"
             type="number"
             value={tenure}
             onChange={(e) => setTenure(e.target.value)}
             placeholder="Enter years"
-            className="h-8 text-xs"
+            className="h-7 text-xs"
           />
         </div>
 
-        <Button onClick={calculateEMI} className="w-full h-8 bg-amber-700 hover:bg-amber-800 text-xs">
+        <Button onClick={calculateEMI} className="w-full h-7 bg-blue-700 hover:bg-blue-800 text-xs">
           Calculate EMI
         </Button>
 
         {emi > 0 && (
-          <div className="mt-3 p-3 bg-yellow-100 rounded-lg border border-yellow-200">
-            <h3 className="font-semibold text-amber-800 mb-2 text-xs">Results</h3>
-            <div className="space-y-1 text-xs">
+          <div className="mt-2 p-2 bg-yellow-100 rounded-lg border border-yellow-200">
+            <h3 className="font-semibold text-blue-800 mb-1 text-xs">Results</h3>
+            <div className="space-y-0.5 text-xs">
               <div className="flex justify-between">
-                <span className="text-amber-700">Monthly EMI:</span>
-                <span className="font-semibold text-amber-800">৳{emi.toLocaleString()}</span>
+                <span className="text-blue-700">Monthly EMI:</span>
+                <span className="font-semibold text-blue-800">৳{emi.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-amber-700">Total Amount:</span>
-                <span className="font-semibold text-amber-800">৳{totalAmount.toLocaleString()}</span>
+                <span className="text-blue-700">Total Amount:</span>
+                <span className="font-semibold text-blue-800">৳{totalAmount.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-amber-700">Total Interest:</span>
-                <span className="font-semibold text-amber-800">৳{totalInterest.toLocaleString()}</span>
+                <span className="text-blue-700">Total Interest:</span>
+                <span className="font-semibold text-blue-800">৳{totalInterest.toLocaleString()}</span>
               </div>
             </div>
           </div>
